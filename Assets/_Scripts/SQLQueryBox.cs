@@ -5,32 +5,31 @@ using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SQLQueryBox : MonoBehaviour
 {
     [SerializeField] private TMP_InputField inputField;
     [SerializeField] private TMP_Text text;
+    [SerializeField] private Button button;
 
     private void Start()
     {
-        inputField.onSubmit.AddListener(OnSubmit);
         inputField.onValueChanged.AddListener(OnValueChanged);
+        button.onClick.AddListener(OnSubmit);
     }
 
-    private void OnSubmit(string query)
+    private void OnSubmit()
     {
-        if (GameManager.Instance.TryExecuteQuery(query, out List<List<string>> results))
+        var query = inputField.text;
+        if (GameManager.Instance.TryExecuteQuery(query, out List<List<string>> result))
         {
-            foreach (var result in results)
-            {
-                string l = "";
-                foreach (var r in result)
-                {
-                    l += r + " | ";
-                }
-
-                Debug.Log(l);
-            }
+            var resultGO = ResourceManager.Instance.QueryResult;
+            var canvasTransform = ResourceManager.Instance.Canvas.transform;
+            var queryResult = Instantiate(resultGO).GetComponent<QueryResult>();
+            queryResult.transform.SetParent(canvasTransform);
+            queryResult.transform.localScale = Vector3.one;
+            queryResult.Init(result);
         }
     }
 

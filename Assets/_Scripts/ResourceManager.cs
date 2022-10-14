@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class ResourceManager : PersistentSingleton<ResourceManager>
 {
-    public string[] SQLKeywords = new[]
+    [HideInInspector] public string[] SQLKeywords = new[]
     {
         "ADD",
         "ADD CONSTRAINT",
@@ -89,6 +89,11 @@ public class ResourceManager : PersistentSingleton<ResourceManager>
         "WHERE",
     };
 
+    public Canvas Canvas;
+    
+    public GameObject Cell;
+    public GameObject QueryResult;
+    
     public bool IsSQLKeyword(string s)
     {
         return SQLKeywords.Contains(s.ToUpper());
