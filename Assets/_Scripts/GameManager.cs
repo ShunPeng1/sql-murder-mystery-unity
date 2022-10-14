@@ -3,11 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Data;
 using Mono.Data.Sqlite;
+using UnityEngine.Networking;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
     private IDbConnection dbConnection;
+
+    public event Action<int> HistoryChosen;
+    public int QueryCount = 0;
+
+    public List<GameObject> queryTables;
+    public List<GameObject> historyItems;
 
     private void Awake()
     {
@@ -18,11 +25,8 @@ public class GameManager : MonoBehaviour
         dbConnection.Open();
     }
 
-
-    public bool TryExecuteQuery(string query, out List<List<string>> results)
+    public void ExecuteQuery(string query)
     {
-        results = null;
-
         IDbCommand cmnd_read = dbConnection.CreateCommand();
         IDataReader reader;
         cmnd_read.CommandText = query;
@@ -32,25 +36,35 @@ public class GameManager : MonoBehaviour
         }
         catch
         {
-            return false;
+            return;
         }
 
-        results = new List<List<string>>();
-        results.Add(new List<string>());
+        List<List<string>> result = new List<List<string>> {new List<string>()};
+
         for (int i = 0; i < reader.FieldCount; i++)
         {
-            results[0].Add(reader.GetName(i));
+            result[0].Add(reader.GetName(i));
         }
 
         while (reader.Read())
         {
-            results.Add(new List<string>());
+            result.Add(new List<string>());
             for (int i = 0; i < reader.FieldCount; i++)
             {
-                results[^1].Add(reader[i].ToString());
+                result[^1].Add(reader[i].ToString());
             }
         }
 
-        return true;
+        CreateResultTable(query, result);
+    }
+
+    private void CreateResultTable(string query, List<List<string>> result)
+    {
+        var resultGO = ResourceManager.Instance.QueryResult;
+        var canvasTransform = ResourceManager.Instance.Canvas.transform;
+        var queryResult = Instantiate(resultGO).GetComponent<QueryResult>();
+        queryResult.transform.SetParent(canvasTransform);
+        queryResult.transform.localScale = Vector3.one;
+        queryResult.Init(query, result);
     }
 }

@@ -93,11 +93,6 @@ public class ResourceManager : PersistentSingleton<ResourceManager>
     
     public GameObject Cell;
     public GameObject QueryResult;
-    
-    public bool IsSQLKeyword(string s)
-    {
-        return SQLKeywords.Contains(s.ToUpper());
-    }
 
     public List<(int, int)> GetKeywordIndicesAndLengths(string query)
     {

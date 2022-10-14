@@ -1,13 +1,9 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SQLQueryBox : MonoBehaviour
+public class SQLQueryBox : PersistentSingleton<SQLQueryBox>
 {
     [SerializeField] private TMP_InputField inputField;
     [SerializeField] private TMP_Text text;
@@ -21,27 +17,23 @@ public class SQLQueryBox : MonoBehaviour
         resetButton.onClick.AddListener(OnReset);
     }
 
-    private void OnSubmit()
+    public void SetText(string query)
     {
-        var query = inputField.text;
-        if (GameManager.Instance.TryExecuteQuery(query, out List<List<string>> result))
-        {
-            var resultGO = ResourceManager.Instance.QueryResult;
-            var canvasTransform = ResourceManager.Instance.Canvas.transform;
-            var queryResult = Instantiate(resultGO).GetComponent<QueryResult>();
-            queryResult.transform.SetParent(canvasTransform);
-            queryResult.transform.localScale = Vector3.one;
-            queryResult.Init(result, 1920, 400);
-        }
+        inputField.text = query;
+        text.text = query;
     }
 
     private void OnReset()
     {
-        inputField.text = "";
-        text.text = "";
+        SetText("");
     }
 
-    private void OnValueChanged(string query)
+    private void OnSubmit()
+    {
+        GameManager.Instance.ExecuteQuery(inputField.text);
+    }
+
+    private string SQLBeautifier(string query)
     {
         StringBuilder stringBuilder = new StringBuilder(query);
 
@@ -56,6 +48,11 @@ public class SQLQueryBox : MonoBehaviour
             stringBuilder.Insert(index, "<color=#" + color + ">");
         }
 
-        text.text = stringBuilder.ToString();
+        return stringBuilder.ToString();
+    }
+
+    private void OnValueChanged(string query)
+    {
+        text.text = SQLBeautifier(query);
     }
 }

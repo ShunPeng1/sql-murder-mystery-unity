@@ -5,11 +5,13 @@ using UnityEngine.UI;
 
 public class QueryResult : MonoBehaviour
 {
+    private int index;
     [SerializeField] private ScrollRect scrollRect;
 
-    public void Init(List<List<string>> result, float scrollViewWidth, float scrollViewHeight)
+    public void Init(string query, List<List<string>> result)
     {
-        Vector2 scrollRectSize = new Vector2(scrollViewWidth, scrollViewHeight);
+        index = GameManager.Instance.QueryCount;
+        Vector2 scrollRectSize = new Vector2(1920, 400);
         scrollRect.GetComponent<RectTransform>().sizeDelta = scrollRectSize;
         
         float cellWidth = 100f;
