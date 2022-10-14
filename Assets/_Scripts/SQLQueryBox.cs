@@ -29,7 +29,7 @@ public class SQLQueryBox : MonoBehaviour
             var queryResult = Instantiate(resultGO).GetComponent<QueryResult>();
             queryResult.transform.SetParent(canvasTransform);
             queryResult.transform.localScale = Vector3.one;
-            queryResult.Init(result);
+            queryResult.Init(result, 1920, 400);
         }
     }
 

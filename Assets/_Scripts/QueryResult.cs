@@ -1,11 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class QueryResult : MonoBehaviour
 {
-    public void Init(List<List<string>> result)
+    [SerializeField] private ScrollRect scrollRect;
+
+    public void Init(List<List<string>> result, float scrollViewWidth, float scrollViewHeight)
     {
+        Vector2 scrollRectSize = new Vector2(scrollViewWidth, scrollViewHeight);
+        scrollRect.GetComponent<RectTransform>().sizeDelta = scrollRectSize;
+        
+        float cellWidth = 100f;
+        float cellHeight = 40f;
+
+        float contentWidth = cellWidth * result[0].Count;
+        float contentHeight = cellHeight * result.Count;
+        scrollRect.content.sizeDelta = new Vector2(contentWidth, contentHeight);
+
         StopAllCoroutines();
         StartCoroutine(Init_CO());
 
@@ -16,11 +29,11 @@ public class QueryResult : MonoBehaviour
                 for (var col = 0; col < result[row].Count; col++)
                 {
                     var cell = Instantiate(ResourceManager.Instance.Cell).GetComponent<Cell>();
-                    cell.transform.SetParent(transform);
+                    cell.transform.SetParent(scrollRect.content);
                     var rectTransform = cell.GetComponent<RectTransform>();
-                    rectTransform.anchoredPosition = new Vector3(col * 100, row * -40f, 0);
+                    rectTransform.anchoredPosition = new Vector3(col * cellWidth, row * -cellHeight, 0);
                     rectTransform.localScale = Vector3.one;
-                    cell.Init(result[row][col], 100f, 40f);
+                    cell.Init(result[row][col], cellWidth, cellHeight);
                 }
 
                 yield return null;
