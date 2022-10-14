@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     private IDbConnection dbConnection;
 
     public event Action<int> HistoryChosen;
-    public int QueryCount = 0;
+    [HideInInspector] public int ResultCount = 0;
 
     public List<GameObject> queryTables;
     public List<GameObject> historyItems;
@@ -62,9 +62,19 @@ public class GameManager : MonoBehaviour
     {
         var resultGO = ResourceManager.Instance.QueryResult;
         var canvasTransform = ResourceManager.Instance.Canvas.transform;
+        
         var queryResult = Instantiate(resultGO).GetComponent<QueryResult>();
         queryResult.transform.SetParent(canvasTransform);
         queryResult.transform.localScale = Vector3.one;
-        queryResult.Init(query, result);
+        queryResult.Init(query, result, ResultCount);
+        
+        OnHistoryChosen(ResultCount);
+        
+        ResultCount++;
+    }
+
+    public void OnHistoryChosen(int index)
+    {
+        HistoryChosen?.Invoke(index);
     }
 }

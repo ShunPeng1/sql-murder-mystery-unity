@@ -92,6 +92,7 @@ public class ResourceManager : PersistentSingleton<ResourceManager>
     public Canvas Canvas;
     
     public GameObject Cell;
+    public GameObject HistoryItem;
     public GameObject QueryResult;
 
     public List<(int, int)> GetKeywordIndicesAndLengths(string query)
@@ -110,7 +111,6 @@ public class ResourceManager : PersistentSingleton<ResourceManager>
             if (start && end) indices.Add((index, keyword.Length));
         }
 
-        Debug.Log(indices.Count);
         return indices;
 
         bool IsAlphaNumeric(char c)

@@ -20,7 +20,7 @@ public class SQLQueryBox : PersistentSingleton<SQLQueryBox>
     public void SetText(string query)
     {
         inputField.text = query;
-        text.text = query;
+        text.text = SQLBeautifier(query);
     }
 
     private void OnReset()
