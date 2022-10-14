@@ -11,12 +11,14 @@ public class SQLQueryBox : MonoBehaviour
 {
     [SerializeField] private TMP_InputField inputField;
     [SerializeField] private TMP_Text text;
-    [SerializeField] private Button button;
+    [SerializeField] private Button submitButton;
+    [SerializeField] private Button resetButton;
 
     private void Start()
     {
         inputField.onValueChanged.AddListener(OnValueChanged);
-        button.onClick.AddListener(OnSubmit);
+        submitButton.onClick.AddListener(OnSubmit);
+        resetButton.onClick.AddListener(OnReset);
     }
 
     private void OnSubmit()
@@ -31,6 +33,12 @@ public class SQLQueryBox : MonoBehaviour
             queryResult.transform.localScale = Vector3.one;
             queryResult.Init(result, 1920, 400);
         }
+    }
+
+    private void OnReset()
+    {
+        inputField.text = "";
+        text.text = "";
     }
 
     private void OnValueChanged(string query)
