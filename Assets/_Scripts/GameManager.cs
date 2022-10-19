@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Data;
-using System.Data.SqlClient;
 using Mono.Data.Sqlite;
 using UnityEngine.Networking;
 
@@ -20,8 +19,8 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-
-        string connection = "URI=file:" + "Assets/sql-murder-mystery.db";
+        string connection =
+            "URI=file:" + Application.dataPath + "/StreamingAssets/sql-murder-mystery.db";
         dbConnection = new SqliteConnection(connection);
         dbConnection.Open();
     }
@@ -63,14 +62,14 @@ public class GameManager : MonoBehaviour
     {
         var resultGO = ResourceManager.Instance.QueryResult;
         var canvasTransform = ResourceManager.Instance.Canvas.transform;
-        
+
         var queryResult = Instantiate(resultGO).GetComponent<QueryResult>();
         queryResult.transform.SetParent(canvasTransform);
         queryResult.transform.localScale = Vector3.one;
         queryResult.Init(query, result, ResultCount);
-        
+
         OnHistoryChosen(ResultCount);
-        
+
         ResultCount++;
     }
 
