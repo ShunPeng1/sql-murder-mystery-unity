@@ -26,12 +26,15 @@ public class QueryResult : MonoBehaviour
 
         GetComponent<RectTransform>().anchoredPosition = AnchoredPosition;
         GetComponent<RectTransform>().sizeDelta = ScrollRectSize;
-        
+
         HistoryList.Instance.CreateHistoryItem(this);
 
         List<List<Cell>> cells = new List<List<Cell>>();
         List<float> widths = Enumerable.Repeat(0f, result[0].Count).ToList();
         List<float> heights = Enumerable.Repeat(0f, result.Count).ToList();
+
+        mainPos = transform.position;
+
         for (var row = 0; row < result.Count; row++)
         {
             cells.Add(new List<Cell>());
@@ -64,7 +67,6 @@ public class QueryResult : MonoBehaviour
         }
 
         scrollRect.content.sizeDelta = new Vector2(widthSoFar, heightSoFar);
-        mainPos = transform.position;
     }
 
     public void Show()
