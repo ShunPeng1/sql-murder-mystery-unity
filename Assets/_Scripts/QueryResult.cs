@@ -19,7 +19,11 @@ public class QueryResult : MonoBehaviour
 
     public void Init(string query, List<List<string>> result, int index)
     {
-        if (result.Count > 100) result = result.GetRange(0, 101);
+        if (result.Count > 100)
+        {
+            result = result.GetRange(0, 101);
+            result.Add(Enumerable.Repeat("...", result[0].Count).ToList());
+        }
 
         Query = query;
         Index = index;
