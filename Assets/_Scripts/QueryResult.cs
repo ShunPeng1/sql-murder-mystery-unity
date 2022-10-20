@@ -19,16 +19,14 @@ public class QueryResult : MonoBehaviour
 
     public void Init(string query, List<List<string>> result, int index)
     {
-        if (result.Count > 51) result = result.GetRange(0, 101);
+        if (result.Count > 100) result = result.GetRange(0, 101);
 
         Query = query;
         Index = index;
 
         GetComponent<RectTransform>().anchoredPosition = AnchoredPosition;
         GetComponent<RectTransform>().sizeDelta = ScrollRectSize;
-
-        HistoryList.Instance.CreateHistoryItem(this);
-
+        
         List<List<Cell>> cells = new List<List<Cell>>();
         List<float> widths = Enumerable.Repeat(0f, result[0].Count).ToList();
         List<float> heights = Enumerable.Repeat(0f, result.Count).ToList();
