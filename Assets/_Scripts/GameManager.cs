@@ -65,6 +65,7 @@ public class GameManager : MonoBehaviour
 
         var queryResult = Instantiate(resultGO).GetComponent<QueryResult>();
         queryResult.transform.SetParent(canvasTransform);
+        queryResult.transform.SetSiblingIndex(0);
         queryResult.transform.localScale = Vector3.one;
         queryResult.Init(query, result, ResultCount);
 
