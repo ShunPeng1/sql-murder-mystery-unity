@@ -16,11 +16,16 @@ public class GameManager : MonoBehaviour
     public List<GameObject> queryTables;
     public List<GameObject> historyItems;
 
+    private GameObject errorMessage;
+
     private void Awake()
     {
         Instance = this;
 
-        string connection = "URI=file:" + "Assets/sql-murder-mystery.db";
+        string dir = Application.dataPath + "/StreamingAssets/";
+        string fileName = "sql-murder-mystery.db";
+        System.IO.File.Copy(dir + fileName, dir + "this-session.db", true);
+        string connection = "URI=file:" + dir + "this-session.db";
         dbConnection = new SqliteConnection(connection);
         dbConnection.Open();
     }
@@ -30,16 +35,21 @@ public class GameManager : MonoBehaviour
         IDbCommand cmnd_read = dbConnection.CreateCommand();
         IDataReader reader;
         cmnd_read.CommandText = query;
+        List<List<string>> result = new List<List<string>> {new List<string>()};
+
         try
         {
             reader = cmnd_read.ExecuteReader();
         }
-        catch
+        catch (SqliteException e)
         {
+            result[0]
+                .Add(string.Join(" ",
+                    e.Message.Split(new[] {'\r'}, StringSplitOptions.RemoveEmptyEntries)));
+            CreateResultTable(query, result, false);
             return;
         }
 
-        List<List<string>> result = new List<List<string>> {new List<string>()};
 
         for (int i = 0; i < reader.FieldCount; i++)
         {
@@ -55,26 +65,41 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        CreateResultTable(query, result);
+        CreateResultTable(query, result, true);
     }
 
-    private void CreateResultTable(string query, List<List<string>> result)
+    private void CreateResultTable(string query, List<List<string>> result, bool record)
     {
         var resultGO = ResourceManager.Instance.QueryResult;
         var canvasTransform = ResourceManager.Instance.Canvas.transform;
-        
+
         var queryResult = Instantiate(resultGO).GetComponent<QueryResult>();
         queryResult.transform.SetParent(canvasTransform);
+        queryResult.transform.SetSiblingIndex(0);
         queryResult.transform.localScale = Vector3.one;
         queryResult.Init(query, result, ResultCount);
-        
-        OnHistoryChosen(ResultCount);
-        
-        ResultCount++;
+
+        if (record)
+        {
+            HistoryList.Instance.CreateHistoryItem(queryResult);
+            OnHistoryChosen(ResultCount);
+            ResultCount++;
+        }
+        else
+        {
+            OnHistoryChosen(-1);
+            errorMessage = queryResult.gameObject;
+        }
     }
 
     public void OnHistoryChosen(int index)
     {
         HistoryChosen?.Invoke(index);
+                        
+        if (errorMessage != null)
+        {
+            Destroy(errorMessage);
+            errorMessage = null;
+        }
     }
 }

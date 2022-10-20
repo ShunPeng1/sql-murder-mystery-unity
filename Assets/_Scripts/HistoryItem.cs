@@ -17,7 +17,10 @@ public class HistoryItem : MonoBehaviour
         GameManager.Instance.HistoryChosen += HistoryChosenHandler;
         button.onClick.AddListener(() => GameManager.Instance.OnHistoryChosen(queryResult.Index));
 
-        text.text = queryResult.Query.Substring(0, 10) + "...";
+        text.text = string.Join(" ",
+            queryResult.Query.Split(new[] {' ', '\n'}, StringSplitOptions.RemoveEmptyEntries));
+
+        if (text.text.Length > 25) text.text = text.text.Substring(0, 25) + "...";
     }
 
     private void HistoryChosenHandler(int index)

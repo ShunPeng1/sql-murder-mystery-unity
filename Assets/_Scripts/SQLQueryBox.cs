@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -6,7 +7,8 @@ using UnityEngine.UI;
 public class SQLQueryBox : PersistentSingleton<SQLQueryBox>
 {
     [SerializeField] private TMP_InputField inputField;
-    [SerializeField] private TMP_Text text;
+    [SerializeField] private TMP_Text frontText;
+    [SerializeField] private TMP_Text actualText;
     [SerializeField] private Button submitButton;
     [SerializeField] private Button resetButton;
 
@@ -17,10 +19,15 @@ public class SQLQueryBox : PersistentSingleton<SQLQueryBox>
         resetButton.onClick.AddListener(OnReset);
     }
 
+    private void Update()
+    {
+        frontText.rectTransform.anchoredPosition = actualText.rectTransform.anchoredPosition;
+    }
+
     public void SetText(string query)
     {
         inputField.text = query;
-        text.text = SQLBeautifier(query);
+        frontText.text = SQLBeautifier(query);
     }
 
     private void OnReset()
@@ -53,6 +60,6 @@ public class SQLQueryBox : PersistentSingleton<SQLQueryBox>
 
     private void OnValueChanged(string query)
     {
-        text.text = SQLBeautifier(query);
+        frontText.text = SQLBeautifier(query);
     }
 }

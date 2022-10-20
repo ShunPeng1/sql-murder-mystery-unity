@@ -89,8 +89,10 @@ public class ResourceManager : PersistentSingleton<ResourceManager>
         "WHERE",
     };
 
-    public Canvas Canvas;
     
+
+    public Canvas Canvas;
+
     public GameObject Cell;
     public GameObject HistoryItem;
     public GameObject QueryResult;
