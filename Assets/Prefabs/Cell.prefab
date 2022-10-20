@@ -71,7 +71,7 @@ MonoBehaviour:
   type: 2
   cornerRadiusMode: 0
   cornerRadii: {x: 0.25, y: 0.25, z: 0.25, w: 0.25}
-  thickness: 0.7
+  thickness: 1
   thicknessSpace: 0
   matchDashSpacingToSize: 1
   dashed: 0
@@ -236,8 +236,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 25
+  m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
