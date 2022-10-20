@@ -31,7 +31,7 @@ public class Cell : MonoBehaviour
         rectangleRect.anchoredPosition = new Vector2(-width / 2, height / 2);
 
         textRect.anchoredPosition += Vector2.right * VisualManager.Instance.Padding;
-        textRect.sizeDelta = new Vector2(width, height);
+        textRect.sizeDelta = new Vector2(width - VisualManager.Instance.Padding * 2, height);
 
         RectTransform.sizeDelta = new Vector2(width, height);
     }
