@@ -31,7 +31,7 @@ public class HistoryList : PersistentSingleton<HistoryList>
         foreach (var item in historyItems)
         {
             var rect = item.GetComponent<RectTransform>();
-            rect.DOMoveX(-itemRect.rect.width / 100f, 0.5f).SetRelative(true); // Magic number
+            rect.DOMoveY(itemRect.rect.height / 100f, 0.5f).SetRelative(true); // Magic number
         }
 
         historyItems.Add(historyItem);

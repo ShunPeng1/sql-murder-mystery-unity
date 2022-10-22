@@ -9,9 +9,10 @@ public class SQLQueryBox : PersistentSingleton<SQLQueryBox>
     [SerializeField] private TMP_InputField inputField;
     [SerializeField] private TMP_Text frontText;
     [SerializeField] private TMP_Text actualText;
+    [SerializeField] private TMP_Text lineCountText;
     [SerializeField] private Button submitButton;
     [SerializeField] private Button resetButton;
-
+    
     private void Start()
     {
         inputField.onValueChanged.AddListener(OnValueChanged);
@@ -21,7 +22,10 @@ public class SQLQueryBox : PersistentSingleton<SQLQueryBox>
 
     private void Update()
     {
-        frontText.rectTransform.anchoredPosition = actualText.rectTransform.anchoredPosition;
+        var pos = actualText.rectTransform.anchoredPosition;
+        lineCountText.rectTransform.anchoredPosition =
+            new Vector2(lineCountText.rectTransform.anchoredPosition.x, pos.y);
+        frontText.rectTransform.anchoredPosition = pos;
     }
 
     public void SetText(string query)

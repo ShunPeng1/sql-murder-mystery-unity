@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class QueryResult : MonoBehaviour
 {
-    private static Vector2 AnchoredPosition = new Vector2(0, 190);
-    private static Vector2 ScrollRectSize = new Vector2(1920, 700);
+    private static Vector2 ScrollRectSize = new Vector2(1920, 820);
 
     [SerializeField] private ScrollRect scrollRect;
     public int Index { get; private set; }
@@ -28,7 +28,7 @@ public class QueryResult : MonoBehaviour
         Query = query;
         Index = index;
 
-        GetComponent<RectTransform>().anchoredPosition = AnchoredPosition;
+        GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
         GetComponent<RectTransform>().sizeDelta = ScrollRectSize;
         
         List<List<Cell>> cells = new List<List<Cell>>();
