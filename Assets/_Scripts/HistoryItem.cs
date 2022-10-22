@@ -37,7 +37,7 @@ public class HistoryItem : MonoBehaviour
             historyIndicator.SetPoint(queryResult.TopPoint.position, queryResult.BottomPoint.position,
                 topPoint.position, bottomPoint.position);
 
-            GameManager.Instance.BezierHistoryIndicator = historyIndicator;
+            GameManager.Instance.SetNewIndicator(historyIndicator);
         }
         else queryResult.Hide();
     }

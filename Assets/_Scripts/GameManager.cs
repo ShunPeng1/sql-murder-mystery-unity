@@ -95,12 +95,6 @@ public class GameManager : MonoBehaviour
 
     public void OnHistoryChosen(int index)
     {
-        if (BezierHistoryIndicator != null)
-        {
-            Destroy(BezierHistoryIndicator);
-            BezierHistoryIndicator = null;
-        }
-
         HistoryChosen?.Invoke(index);
 
         if (errorMessage != null)
@@ -108,5 +102,15 @@ public class GameManager : MonoBehaviour
             Destroy(errorMessage);
             errorMessage = null;
         }
+    }
+
+    public void SetNewIndicator(BezierHistoryIndicator indicator)
+    {
+        if (BezierHistoryIndicator != null)
+        {
+            Destroy(BezierHistoryIndicator.gameObject);
+        }
+        
+        BezierHistoryIndicator = indicator;
     }
 }

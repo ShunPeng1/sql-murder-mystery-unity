@@ -15,35 +15,17 @@ public class BezierHistoryIndicator : MonoBehaviour
     [SerializeField] private Vector3 bottomStartControl;
     [SerializeField] private Vector3 bottomEndControl;
 
-    private Vector3 tablePointTop;
-    private Vector3 tablePointBottom;
-    private Vector3 itemPointTop;
-    private Vector3 itemPointBottom;
-    private bool init = false;
-
     public void SetPoint(Vector3 tablePointTop, Vector3 tablePointBottom, Vector3 itemPointTop,
         Vector3 itemPointBottom)
     {
-        this.tablePointTop = tablePointTop;
-        this.tablePointBottom = tablePointBottom;
-        this.itemPointTop = itemPointTop;
-        this.itemPointBottom = itemPointBottom;
-        init = true;
-    }
-
-    private void Update()
-    {
-        if (!init) return;
-
         List<Vector3> topList = new List<Vector3>();
-        var tsc = Lerp(tablePointTop, itemPointTop, topStartControl);
-        var tec = Lerp(tablePointTop, itemPointTop, topEndControl);
-        DOCurve.CubicBezier.GetSegmentPointCloud(topList, tablePointTop, tsc, itemPointTop, tec, 20);
+
+        DOCurve.CubicBezier.GetSegmentPointCloud(topList, tablePointTop, tablePointTop + topStartControl,
+            itemPointTop, itemPointTop + topEndControl, 20);
 
         List<Vector3> bottomList = new List<Vector3>();
-        var bsc = Lerp(tablePointBottom, itemPointBottom, bottomStartControl);
-        var bec = Lerp(tablePointBottom, itemPointBottom, bottomEndControl);
-        DOCurve.CubicBezier.GetSegmentPointCloud(bottomList, tablePointBottom, bsc, itemPointBottom, bec,
+        DOCurve.CubicBezier.GetSegmentPointCloud(bottomList, tablePointBottom,
+            tablePointBottom + bottomStartControl, itemPointBottom, itemPointBottom + bottomEndControl,
             20);
 
         bottomList.Reverse();
@@ -61,10 +43,5 @@ public class BezierHistoryIndicator : MonoBehaviour
         }
 
         polygon.SetPoints(list);
-    }
-
-    public Vector2 Lerp(Vector2 a, Vector2 b, Vector2 t)
-    {
-        return new Vector2(Mathf.LerpUnclamped(a.x, b.x, t.x), Mathf.LerpUnclamped(a.y, b.y, t.y));
     }
 }

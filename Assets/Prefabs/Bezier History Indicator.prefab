@@ -174,3 +174,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   polygon: {fileID: 5493440390324257118}
+  topStartControl: {x: 2, y: 0, z: 0}
+  topEndControl: {x: -2, y: 0, z: 0}
+  bottomStartControl: {x: 2, y: 0, z: 0}
+  bottomEndControl: {x: -2, y: 0, z: 0}
