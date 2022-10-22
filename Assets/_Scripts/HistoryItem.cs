@@ -10,6 +10,8 @@ public class HistoryItem : MonoBehaviour
     private QueryResult queryResult;
     [SerializeField] private Button button;
     [SerializeField] private TMP_Text text;
+    [SerializeField] private RectTransform topPoint;
+    [SerializeField] private RectTransform bottomPoint;
 
     public void Init(QueryResult queryResult)
     {
@@ -25,7 +27,18 @@ public class HistoryItem : MonoBehaviour
 
     private void HistoryChosenHandler(int index)
     {
-        if (index == queryResult.Index) queryResult.Show();
+        if (index == queryResult.Index)
+        {
+            queryResult.Show();
+
+            var historyIndicator = Instantiate(ResourceManager.Instance.BezierHistoryIndicator)
+                .GetComponent<BezierHistoryIndicator>();
+
+            historyIndicator.SetPoint(queryResult.TopPoint.position, queryResult.BottomPoint.position,
+                topPoint.position, bottomPoint.position);
+
+            GameManager.Instance.BezierHistoryIndicator = historyIndicator;
+        }
         else queryResult.Hide();
     }
 }

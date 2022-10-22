@@ -96,7 +96,8 @@ public class ResourceManager : PersistentSingleton<ResourceManager>
     public GameObject Cell;
     public GameObject HistoryItem;
     public GameObject QueryResult;
-
+    public GameObject BezierHistoryIndicator;
+    
     public GameObject QueryResultRect;
 
     public List<(int, int)> GetKeywordIndicesAndLengths(string query)

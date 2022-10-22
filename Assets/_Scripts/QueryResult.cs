@@ -13,8 +13,14 @@ public class QueryResult : MonoBehaviour
 {
     [SerializeField] private ScrollRect scrollRect;
     [SerializeField] private Rectangle rectangle;
-    [FormerlySerializedAs("MaxSize")] [SerializeField] private Vector2 maxSize;
+
+    [FormerlySerializedAs("MaxSize")] [SerializeField]
+    private Vector2 maxSize;
+
     [SerializeField] private float margin;
+    public RectTransform TopPoint;
+    public RectTransform BottomPoint;
+    
     public int Index { get; private set; }
     public string Query { get; private set; }
 
@@ -74,11 +80,11 @@ public class QueryResult : MonoBehaviour
 
         scrollRect.content.sizeDelta = new Vector2(widthSoFar, heightSoFar);
 
-        var rectangleSize =
-            new Vector2(Mathf.Min(widthSoFar, maxSize.x) + margin, Mathf.Min(heightSoFar, maxSize.y));
+        var rectangleSize = new Vector2(Mathf.Min(widthSoFar, maxSize.x) + margin,
+            Mathf.Min(heightSoFar, maxSize.y));
 
         rectTransform.sizeDelta = rectangleSize;
-        
+
         scrollRect.GetComponent<RectTransform>().sizeDelta = new Vector2(-margin, 0);
         rectangle.Width = rectangleSize.x;
         rectangle.Height = rectangleSize.y;

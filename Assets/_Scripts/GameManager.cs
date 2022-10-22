@@ -13,8 +13,7 @@ public class GameManager : MonoBehaviour
     public event Action<int> HistoryChosen;
     [HideInInspector] public int ResultCount = 0;
 
-    public List<GameObject> queryTables;
-    public List<GameObject> historyItems;
+    public BezierHistoryIndicator BezierHistoryIndicator;
 
     private GameObject errorMessage;
 
@@ -33,7 +32,7 @@ public class GameManager : MonoBehaviour
     public void ExecuteQuery(string query)
     {
         if (query == string.Empty) return;
-        
+
         IDbCommand cmnd_read = dbConnection.CreateCommand();
         IDataReader reader;
         cmnd_read.CommandText = query;
@@ -96,8 +95,14 @@ public class GameManager : MonoBehaviour
 
     public void OnHistoryChosen(int index)
     {
+        if (BezierHistoryIndicator != null)
+        {
+            Destroy(BezierHistoryIndicator);
+            BezierHistoryIndicator = null;
+        }
+
         HistoryChosen?.Invoke(index);
-                        
+
         if (errorMessage != null)
         {
             Destroy(errorMessage);
