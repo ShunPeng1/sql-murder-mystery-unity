@@ -16,6 +16,11 @@ public class Cell : MonoBehaviour
     private bool isDeployed;
     private TextMeshProUGUI textMeshProUGUI;
 
+    public void ExtendWidth(float newWidth)
+    {
+        textRect.sizeDelta = new Vector2(newWidth, textRect.sizeDelta.y);
+    }
+
     public Vector2 InitText(string data)
     {
         data = string.Join(" ", data.Split(new[] {' ', '\n'}, StringSplitOptions.RemoveEmptyEntries));

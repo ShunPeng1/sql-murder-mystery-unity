@@ -51,6 +51,16 @@ public class QueryResult : MonoBehaviour
         List<float> widths = Enumerable.Repeat(0f, result[0].Count).ToList();
         List<float> heights = Enumerable.Repeat(0f, result.Count).ToList();
 
+        float extendWidth = result[0].Count switch
+        {
+            1 => 2000f,
+            2 => 1500f,
+            3 => 100f,
+            4 => 700f,
+            5 => 500f,
+            _ => -1
+        };
+
         for (var row = 0; row < result.Count; row++)
         {
             cells.Add(new List<Cell>());
@@ -58,6 +68,7 @@ public class QueryResult : MonoBehaviour
             {
                 var cell = ResourceManager.Instance.GetCell();
                 cell.transform.SetParent(scrollRect.content);
+                if (extendWidth > 0) cell.ExtendWidth(extendWidth);
                 var size = cell.InitText(result[row][col]);
                 cells[row].Add(cell);
                 widths[col] = Mathf.Max(widths[col], size.x);
@@ -84,8 +95,8 @@ public class QueryResult : MonoBehaviour
             heightSoFar += heights[row] + VisualManager.Instance.Padding * 2;
         }
 
-        var outerRectangleSize = new Vector2(Mathf.Min(widthSoFar, maxSize.x) + margin,
-            Mathf.Min(heightSoFar, maxSize.y));
+        var outerRectangleSize = new Vector2(Mathf.Min(widthSoFar + margin, maxSize.x),
+            Mathf.Min(heightSoFar + margin, maxSize.y));
 
         rectTransform.anchoredPosition = Vector2.zero;
         rectTransform.sizeDelta = outerRectangleSize;
