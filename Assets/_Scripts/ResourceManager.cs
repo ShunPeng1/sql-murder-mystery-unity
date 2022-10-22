@@ -97,6 +97,8 @@ public class ResourceManager : PersistentSingleton<ResourceManager>
     public GameObject HistoryItem;
     public GameObject QueryResult;
 
+    public GameObject QueryResultRect;
+
     public List<(int, int)> GetKeywordIndicesAndLengths(string query)
     {
         List<(int, int)> indices = new List<(int, int)>();

@@ -1445,11 +1445,11 @@ RectTransform:
   m_Father: {fileID: 42127346}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 150}
-  m_SizeDelta: {x: 1920, y: 780}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 15, y: -15}
+  m_SizeDelta: {x: 1530, y: 750}
+  m_Pivot: {x: 0, y: 1}
 --- !u!1 &896573263
 GameObject:
   m_ObjectHideFlags: 0
@@ -2120,6 +2120,7 @@ MonoBehaviour:
   Cell: {fileID: 3990507000788721152, guid: af1fbdd54cc29874ca40a519d37ea0d8, type: 3}
   HistoryItem: {fileID: 3195130384655299148, guid: dafe92176f8f23c47aba6a7d921156d2, type: 3}
   QueryResult: {fileID: 4035812501496455195, guid: cf606fbe59d1b0e438b5859772c1750f, type: 3}
+  QueryResultRect: {fileID: 878935917}
 --- !u!4 &1449665048
 Transform:
   m_ObjectHideFlags: 0

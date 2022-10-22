@@ -2,16 +2,19 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Shapes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class QueryResult : MonoBehaviour
 {
-    private static Vector2 ScrollRectSize = new Vector2(1920, 820);
-
     [SerializeField] private ScrollRect scrollRect;
+    [SerializeField] private Rectangle rectangle;
+    [FormerlySerializedAs("MaxSize")] [SerializeField] private Vector2 maxSize;
+    [SerializeField] private float margin;
     public int Index { get; private set; }
     public string Query { get; private set; }
 
@@ -28,9 +31,10 @@ public class QueryResult : MonoBehaviour
         Query = query;
         Index = index;
 
-        GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-        GetComponent<RectTransform>().sizeDelta = ScrollRectSize;
-        
+        var rectTransform = GetComponent<RectTransform>();
+        rectTransform.SetParent(ResourceManager.Instance.QueryResultRect.transform);
+        rectTransform.anchoredPosition = Vector2.zero;
+
         List<List<Cell>> cells = new List<List<Cell>>();
         List<float> widths = Enumerable.Repeat(0f, result[0].Count).ToList();
         List<float> heights = Enumerable.Repeat(0f, result.Count).ToList();
@@ -69,12 +73,21 @@ public class QueryResult : MonoBehaviour
         }
 
         scrollRect.content.sizeDelta = new Vector2(widthSoFar, heightSoFar);
+
+        var rectangleSize =
+            new Vector2(Mathf.Min(widthSoFar, maxSize.x) + margin, Mathf.Min(heightSoFar, maxSize.y));
+
+        rectTransform.sizeDelta = rectangleSize;
+        
+        scrollRect.GetComponent<RectTransform>().sizeDelta = new Vector2(-margin, 0);
+        rectangle.Width = rectangleSize.x;
+        rectangle.Height = rectangleSize.y;
     }
 
     public void Show()
     {
         transform.position = mainPos;
-        SQLQueryBox.Instance.SetText(Query);
+        //SQLQueryBox.Instance.SetText(Query);
     }
 
     public void Hide()
