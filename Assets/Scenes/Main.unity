@@ -622,8 +622,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ResultCount: 0
-  queryTables: []
-  historyItems: []
+  BezierHistoryIndicator: {fileID: 0}
 --- !u!4 &376528151
 Transform:
   m_ObjectHideFlags: 0
@@ -1398,6 +1397,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SQLKeywordColor: {r: 0.6313726, g: 0.5647059, b: 0.8901961, a: 1}
+  SQLNameColor: {r: 0.990566, g: 0.8476322, b: 0.39622638, a: 1}
+  SQLStringColor: {r: 1, g: 0.4249544, b: 0.20188677, a: 1}
+  SQLNumberColor: {r: 0.2588235, g: 1, b: 0.47165668, a: 1}
   Padding: 10
 --- !u!4 &864942024
 Transform:
@@ -2036,6 +2038,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44a45a9f742b4672af729cb99e6fa406, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SQLTableNames:
+  - crime_scene_report
+  - drivers_license
+  - facebook_event_checkin
+  - interview
+  - get_fit_now_member
+  - get_fit_now_check_in
+  - solution
+  - income
+  - person
   SQLKeywords:
   - ADD
   - ADD CONSTRAINT
@@ -2117,9 +2129,10 @@ MonoBehaviour:
   - VIEW
   - WHERE
   Canvas: {fileID: 42127345}
-  Cell: {fileID: 3990507000788721152, guid: af1fbdd54cc29874ca40a519d37ea0d8, type: 3}
+  cell: {fileID: 3990507000788721152, guid: af1fbdd54cc29874ca40a519d37ea0d8, type: 3}
   HistoryItem: {fileID: 3195130384655299148, guid: dafe92176f8f23c47aba6a7d921156d2, type: 3}
   QueryResult: {fileID: 4035812501496455195, guid: cf606fbe59d1b0e438b5859772c1750f, type: 3}
+  BezierHistoryIndicator: {fileID: 5010207156485542916, guid: 7a45dabaa004ce84eb81cbd8fee7c3f3, type: 3}
   QueryResultRect: {fileID: 878935917}
 --- !u!4 &1449665048
 Transform:

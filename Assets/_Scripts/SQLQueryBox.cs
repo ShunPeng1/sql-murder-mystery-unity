@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -26,12 +27,13 @@ public class SQLQueryBox : PersistentSingleton<SQLQueryBox>
         lineCountText.rectTransform.anchoredPosition =
             new Vector2(lineCountText.rectTransform.anchoredPosition.x, pos.y);
         frontText.rectTransform.anchoredPosition = pos;
-        
+
         StringBuilder str = new StringBuilder();
         for (int i = 0; i < actualText.textInfo.lineCount; i++)
         {
             str.Append((i + 1).ToString() + '\n');
         }
+
         lineCountText.text = str.ToString();
     }
 
@@ -56,15 +58,22 @@ public class SQLQueryBox : PersistentSingleton<SQLQueryBox>
     {
         StringBuilder stringBuilder = new StringBuilder(query);
 
-        var indicesAndLengths = ResourceManager.Instance.GetKeywordIndicesAndLengths(query);
-        indicesAndLengths.Sort((a, b) => a.Item1 < b.Item1 ? 1 : -1);
+        var keywords = ResourceManager.Instance.GetKeywordIndicesAndLengths(query, SpecialType.Keyword);
+        var names = ResourceManager.Instance.GetKeywordIndicesAndLengths(query, SpecialType.Name);
+        var strings = ResourceManager.Instance.GetKeywordIndicesAndLengths(query, SpecialType.String);
+        var numbers = ResourceManager.Instance.GetKeywordIndicesAndLengths(query, SpecialType.Number);
 
-        string color = ColorUtility.ToHtmlStringRGB(VisualManager.Instance.SQLKeywordColor);
+        List<SpecialWord> list = new List<SpecialWord>();
+        list.AddRange(keywords);
+        list.AddRange(names);
+        list.AddRange(strings);
+        list.AddRange(numbers);
+        list.Sort((a, b) => a.Index < b.Index ? 1 : -1);
 
-        foreach (var (index, length) in indicesAndLengths)
+        foreach (var word in list)
         {
-            stringBuilder.Insert(index + length, "</color>");
-            stringBuilder.Insert(index, "<color=#" + color + ">");
+            stringBuilder.Insert(word.Index + word.Length, "</color>");
+            stringBuilder.Insert(word.Index, "<color=#" + word.GetColorHex() + ">");
         }
 
         return stringBuilder.ToString();
