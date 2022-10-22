@@ -26,6 +26,13 @@ public class SQLQueryBox : PersistentSingleton<SQLQueryBox>
         lineCountText.rectTransform.anchoredPosition =
             new Vector2(lineCountText.rectTransform.anchoredPosition.x, pos.y);
         frontText.rectTransform.anchoredPosition = pos;
+        
+        StringBuilder str = new StringBuilder();
+        for (int i = 0; i < actualText.textInfo.lineCount; i++)
+        {
+            str.Append((i + 1).ToString() + '\n');
+        }
+        lineCountText.text = str.ToString();
     }
 
     public void SetText(string query)
