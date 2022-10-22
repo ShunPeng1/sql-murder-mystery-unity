@@ -41,4 +41,10 @@ public class HistoryItem : MonoBehaviour
         }
         else queryResult.Hide();
     }
+
+    private void OnDestroy()
+    {
+        GameManager.Instance.HistoryChosen -= HistoryChosenHandler;
+        queryResult.Destroy();
+    }
 }

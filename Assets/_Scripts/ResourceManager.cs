@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -89,16 +91,56 @@ public class ResourceManager : PersistentSingleton<ResourceManager>
         "WHERE",
     };
 
-    
 
     public Canvas Canvas;
 
-    public GameObject Cell;
+    [SerializeField] private GameObject cell;
     public GameObject HistoryItem;
     public GameObject QueryResult;
     public GameObject BezierHistoryIndicator;
-    
+
     public GameObject QueryResultRect;
+
+    private List<Cell> cellPool = new List<Cell>();
+
+
+    private void Start()
+    {
+        StartCoroutine(InitPool_CO(100));
+    }
+
+    private IEnumerator InitPool_CO(int batchCount)
+    {
+        for (int i = 0; i < batchCount; i++)
+        {
+            InitSumCells();
+            yield return null;
+        }
+    }
+
+    private void InitSumCells()
+    {
+        for (int j = 0; j < 50; j++)
+        {
+            var c = Instantiate(cell).GetComponent<Cell>();
+            cellPool.Add(c);
+            c.IsDeployed = false;
+        }
+    }
+
+    public Cell GetCell()
+    {
+        foreach (var cell in cellPool)
+        {
+            if (cell.IsDeployed) continue;
+            cell.IsDeployed = true;
+            return cell;
+        }
+        
+        InitSumCells();
+        cellPool[^1].IsDeployed = true;
+        return cellPool[^1];
+    }
 
     public List<(int, int)> GetKeywordIndicesAndLengths(string query)
     {

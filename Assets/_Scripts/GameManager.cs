@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     public BezierHistoryIndicator BezierHistoryIndicator;
 
     private GameObject errorMessage;
-
+    
     private void Awake()
     {
         Instance = this;

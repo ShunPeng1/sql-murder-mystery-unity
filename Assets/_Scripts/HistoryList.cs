@@ -10,13 +10,7 @@ public class HistoryList : PersistentSingleton<HistoryList>
     [SerializeField] private ScrollRect scrollRect;
     private List<HistoryItem> historyItems = new List<HistoryItem>();
     private float actualWidth;
-    private float initialY;
-
-    private void Start()
-    {
-        initialY = GetComponent<RectTransform>().anchoredPosition.y;
-    }
-
+    
     public void CreateHistoryItem(QueryResult queryResult)
     {
         var historyItem = Instantiate(ResourceManager.Instance.HistoryItem).GetComponent<HistoryItem>();
@@ -35,12 +29,11 @@ public class HistoryList : PersistentSingleton<HistoryList>
         }
 
         historyItems.Add(historyItem);
-        // actualWidth += itemRect.sizeDelta.x;
-        // if (actualWidth > 1920)
-        // {
-        //     var size = new Vector2(actualWidth, scrollRect.content.sizeDelta.y);
-        //     scrollRect.content.anchoredPosition = new Vector2(size.x, initialY);
-        //     scrollRect.content.sizeDelta = size;
-        // }
+
+        if (historyItems.Count > 10)
+        {
+            Destroy(historyItems[0].gameObject);
+            historyItems.RemoveAt(0);
+        }
     }
 }

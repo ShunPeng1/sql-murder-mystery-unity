@@ -15,11 +15,12 @@ public class QueryResult : MonoBehaviour
     [SerializeField] private Rectangle innerRectangle;
     [SerializeField] private Rectangle outerRectangle;
 
-    private Vector2 maxSize;
+    private List<List<Cell>> cells = new List<List<Cell>>();
 
     [SerializeField] private float margin;
     public RectTransform TopPoint;
     public RectTransform BottomPoint;
+    private Vector2 maxSize;
 
     public int Index { get; private set; }
     public string Query { get; private set; }
@@ -41,7 +42,6 @@ public class QueryResult : MonoBehaviour
         rectTransform.SetParent(ResourceManager.Instance.QueryResultRect.transform);
         maxSize = ResourceManager.Instance.QueryResultRect.GetComponent<RectTransform>().sizeDelta;
 
-        List<List<Cell>> cells = new List<List<Cell>>();
         List<float> widths = Enumerable.Repeat(0f, result[0].Count).ToList();
         List<float> heights = Enumerable.Repeat(0f, result.Count).ToList();
 
@@ -50,7 +50,7 @@ public class QueryResult : MonoBehaviour
             cells.Add(new List<Cell>());
             for (var col = 0; col < result[row].Count; col++)
             {
-                var cell = Instantiate(ResourceManager.Instance.Cell).GetComponent<Cell>();
+                var cell = ResourceManager.Instance.GetCell();
                 cell.transform.SetParent(scrollRect.content);
                 var size = cell.InitText(result[row][col]);
                 cells[row].Add(cell);
@@ -94,12 +94,24 @@ public class QueryResult : MonoBehaviour
 
     public void Show()
     {
-        transform.position = mainPos;
-        //SQLQueryBox.Instance.SetText(Query);
+        gameObject.SetActive(true);
     }
 
     public void Hide()
     {
-        transform.position = Vector3.left * 10000;
+        gameObject.SetActive(false);
+    }
+
+    public void Destroy()
+    {
+        foreach (var row in cells)
+        {
+            foreach (var cell in row)
+            {
+                cell.ReturnToPool();
+            }
+        }
+
+        Destroy(gameObject, 3f);
     }
 }
