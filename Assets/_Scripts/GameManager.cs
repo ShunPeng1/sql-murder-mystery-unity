@@ -32,6 +32,8 @@ public class GameManager : MonoBehaviour
 
     public void ExecuteQuery(string query)
     {
+        if (query == string.Empty) return;
+        
         IDbCommand cmnd_read = dbConnection.CreateCommand();
         IDataReader reader;
         cmnd_read.CommandText = query;
