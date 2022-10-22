@@ -27,18 +27,7 @@ public class HistoryItem : MonoBehaviour
 
     private void HistoryChosenHandler(int index)
     {
-        if (index == queryResult.Index)
-        {
-            queryResult.Show();
-
-            var historyIndicator = Instantiate(ResourceManager.Instance.BezierHistoryIndicator)
-                .GetComponent<BezierHistoryIndicator>();
-
-            historyIndicator.SetPoint(queryResult.TopPoint.position, queryResult.BottomPoint.position,
-                topPoint.position, bottomPoint.position);
-
-            GameManager.Instance.SetNewIndicator(historyIndicator);
-        }
+        if (index == queryResult.Index) queryResult.Show(topPoint.position, bottomPoint.position);
         else queryResult.Hide();
     }
 

@@ -102,44 +102,60 @@ public class ResourceManager : PersistentSingleton<ResourceManager>
     public GameObject QueryResultRect;
 
     private List<Cell> cellPool = new List<Cell>();
+    private List<Cell> retiredPool = new List<Cell>();
 
 
     private void Start()
     {
-        StartCoroutine(InitPool_CO(100));
+        StartCoroutine(InitPool_CO(500));
     }
 
-    private IEnumerator InitPool_CO(int batchCount)
+    private IEnumerator InitPool_CO(int count)
     {
-        for (int i = 0; i < batchCount; i++)
+        for (int i = 0; i < count; i++)
         {
-            InitSumCells();
-            yield return null;
-        }
-    }
-
-    private void InitSumCells()
-    {
-        for (int j = 0; j < 50; j++)
-        {
-            var c = Instantiate(cell).GetComponent<Cell>();
-            cellPool.Add(c);
-            c.IsDeployed = false;
+            InstantiateCell();
+            if (i % 100 == 99) yield return null;
         }
     }
 
     public Cell GetCell()
     {
-        foreach (var cell in cellPool)
+        if (cellPool.Count == 0) InstantiateCell();
+        var c = cellPool[^1];
+        cellPool.RemoveAt(cellPool.Count - 1);
+        return c;
+    }
+
+    public void Retire(Cell cell)
+    {
+        retiredPool.Add(cell);
+        cell.gameObject.SetActive(false);
+    }
+
+    private void Update()
+    {
+        InstantiateCell();
+        DestroyCell();
+    }
+
+    private void InstantiateCell()
+    {
+        if (cellPool.Count > 2000) return;
+        for (int i = 0; i < 3; i++)
         {
-            if (cell.IsDeployed) continue;
-            cell.IsDeployed = true;
-            return cell;
+            cellPool.Add(Instantiate(cell).GetComponent<Cell>());
         }
-        
-        InitSumCells();
-        cellPool[^1].IsDeployed = true;
-        return cellPool[^1];
+    }
+
+    private void DestroyCell()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            if (retiredPool.Count == 0) return;
+            Destroy(retiredPool[^1].gameObject);
+            retiredPool.RemoveAt(retiredPool.Count - 1);
+        }
     }
 
     public List<(int, int)> GetKeywordIndicesAndLengths(string query)

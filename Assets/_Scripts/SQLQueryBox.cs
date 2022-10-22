@@ -12,7 +12,7 @@ public class SQLQueryBox : PersistentSingleton<SQLQueryBox>
     [SerializeField] private TMP_Text lineCountText;
     [SerializeField] private Button submitButton;
     [SerializeField] private Button resetButton;
-    
+
     private void Start()
     {
         inputField.onValueChanged.AddListener(OnValueChanged);
@@ -41,7 +41,8 @@ public class SQLQueryBox : PersistentSingleton<SQLQueryBox>
 
     private void OnSubmit()
     {
-        GameManager.Instance.ExecuteQuery(inputField.text);
+        if (QueryResult.IsCurrentResultDoneInit)
+            GameManager.Instance.ExecuteQuery(inputField.text);
     }
 
     private string SQLBeautifier(string query)

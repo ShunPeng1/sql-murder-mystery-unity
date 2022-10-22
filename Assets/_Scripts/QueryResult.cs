@@ -25,9 +25,15 @@ public class QueryResult : MonoBehaviour
     public int Index { get; private set; }
     public string Query { get; private set; }
 
-    private Vector3 mainPos;
+    public static bool IsCurrentResultDoneInit = true;
 
     public void Init(string query, List<List<string>> result, int index)
+    {
+        IsCurrentResultDoneInit = false;
+        StartCoroutine(Init_CO(query, result, index));
+    }
+
+    private IEnumerator Init_CO(string query, List<List<string>> result, int index)
     {
         if (result.Count > 100)
         {
@@ -57,6 +63,8 @@ public class QueryResult : MonoBehaviour
                 widths[col] = Mathf.Max(widths[col], size.x);
                 heights[row] = Mathf.Max(heights[row], size.y);
             }
+
+            if (row % 10 == 9) yield return null;
         }
 
         float widthSoFar = 0f;
@@ -81,7 +89,6 @@ public class QueryResult : MonoBehaviour
 
         rectTransform.anchoredPosition = Vector2.zero;
         rectTransform.sizeDelta = outerRectangleSize;
-        mainPos = transform.position;
 
         scrollRect.content.sizeDelta = new Vector2(widthSoFar, heightSoFar);
         scrollRect.GetComponent<RectTransform>().sizeDelta = new Vector2(-margin, -margin);
@@ -90,11 +97,29 @@ public class QueryResult : MonoBehaviour
 
         innerRectangle.Width = outerRectangleSize.x - margin;
         innerRectangle.Height = outerRectangleSize.y - margin;
+
+        IsCurrentResultDoneInit = true;
     }
 
-    public void Show()
+    public void Show(Vector2 topPoint, Vector2 bottomPoint)
     {
         gameObject.SetActive(true);
+        StartCoroutine(ShowIndicator_CO(topPoint, bottomPoint));
+    }
+
+    private IEnumerator ShowIndicator_CO(Vector2 topPoint, Vector2 bottomPoint)
+    {
+        while (!IsCurrentResultDoneInit)
+        {
+            yield return null;
+        }
+
+        var historyIndicator = Instantiate(ResourceManager.Instance.BezierHistoryIndicator)
+            .GetComponent<BezierHistoryIndicator>();
+
+        historyIndicator.SetPoint(TopPoint.position, BottomPoint.position, topPoint, bottomPoint);
+
+        GameManager.Instance.SetNewIndicator(historyIndicator);
     }
 
     public void Hide()
