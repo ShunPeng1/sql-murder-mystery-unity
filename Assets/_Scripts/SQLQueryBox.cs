@@ -13,12 +13,14 @@ public class SQLQueryBox : PersistentSingleton<SQLQueryBox>
     [SerializeField] private TMP_Text lineCountText;
     [SerializeField] private Button submitButton;
     [SerializeField] private Button resetButton;
+    [SerializeField] private Button helpButton;
 
     private void Start()
     {
         inputField.onValueChanged.AddListener(OnValueChanged);
         submitButton.onClick.AddListener(OnSubmit);
         resetButton.onClick.AddListener(OnReset);
+        helpButton.onClick.AddListener(() => InfoPanel.Instance.Show());
     }
 
     private void Update()
