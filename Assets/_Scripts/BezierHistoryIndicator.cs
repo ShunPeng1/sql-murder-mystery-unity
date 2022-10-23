@@ -33,6 +33,7 @@ public class BezierHistoryIndicator : MonoBehaviour
 
     public void UpdateShape()
     {
+        if (tablePointTop == null) return;
         List<Vector3> topList = new List<Vector3>();
 
         DOCurve.CubicBezier.GetSegmentPointCloud(topList, tablePointTop.position,

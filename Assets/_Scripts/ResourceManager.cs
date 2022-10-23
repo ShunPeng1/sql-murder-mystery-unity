@@ -164,7 +164,7 @@ public class ResourceManager : PersistentSingleton<ResourceManager>
 
     private void DestroyCell()
     {
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 1; i++)
         {
             if (retiredPool.Count == 0) return;
             Destroy(retiredPool[^1].gameObject);

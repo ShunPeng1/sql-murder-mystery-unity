@@ -39,7 +39,7 @@ public class QueryResult : MonoBehaviour
     public static QueryResult ShowingResult;
     public static bool IsCurrentResultAnimating = false;
     private bool doneInit = false;
-
+    
     private IEnumerator Show_CO()
     {
         while (IsCurrentResultAnimating || !doneInit) yield return null;
@@ -156,7 +156,7 @@ public class QueryResult : MonoBehaviour
         gameObject.SetActive(false);
 
         scrollRect.content.anchoredPosition = Vector2.zero;
-        
+
         IsCurrentResultAnimating = false;
     }
 
@@ -173,7 +173,7 @@ public class QueryResult : MonoBehaviour
 
         if (result.Count > 100)
         {
-            result = result.GetRange(0, 101);
+            result = result.GetRange(0, 100);
             result.Add(Enumerable.Repeat("...", result[0].Count).ToList());
         }
 
@@ -212,7 +212,7 @@ public class QueryResult : MonoBehaviour
                 heights[row] = Mathf.Max(heights[row], size.y);
             }
 
-            if (row % 5 == 4) yield return null;
+            if (row % 4 == 3) yield return null;
         }
 
         float widthSoFar = 0f;
@@ -259,7 +259,7 @@ public class QueryResult : MonoBehaviour
     public void Show()
     {
         if (ShowingResult != this && ShowingResult != null)
-            ShowingResult.Hide(HistoryList.Instance.JustCreated);
+            ShowingResult.Hide();
 
         if (ShowingResult != this)
         {
@@ -270,21 +270,32 @@ public class QueryResult : MonoBehaviour
         ShowingResult = this;
     }
 
-    public void Hide(bool justCreated)
+    public void Hide()
     {
-        StartCoroutine(Hide_CO(justCreated));
+        StartCoroutine(Hide_CO(HistoryList.Instance.JustCreated));
     }
 
     public void Destroy()
     {
-        foreach (var row in cells)
+        gameObject.SetActive(true);
+        StartCoroutine(Destroy_CO());
+    }
+
+    private IEnumerator Destroy_CO()
+    {
+        if (ShowingResult == this) yield return Hide_CO(HistoryList.Instance.JustCreated);
+        Destroy(historyIndicator.gameObject);
+        yield return new WaitForSeconds(3f);
+        for (var row = 0; row < cells.Count; row++)
         {
-            foreach (var cell in row)
+            foreach (var cell in cells[row])
             {
                 cell.ReturnToPool();
             }
+
+            yield return null;
         }
 
-        Destroy(gameObject, 3f);
+        Destroy(gameObject, 1f);
     }
 }

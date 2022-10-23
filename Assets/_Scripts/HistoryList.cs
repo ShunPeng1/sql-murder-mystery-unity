@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,7 +35,7 @@ public class HistoryList : PersistentSingleton<HistoryList>
 
         if (historyItems.Count > 10)
         {
-            Destroy(historyItems[0].gameObject);
+            historyItems[0].Destroy();
             historyItems.RemoveAt(0);
         }
 

@@ -37,9 +37,16 @@ public class HistoryItem : MonoBehaviour
         }
     }
 
-    private void OnDestroy()
+    public void Destroy()
     {
         GameManager.Instance.HistoryChosen -= HistoryChosenHandler;
         queryResult.Destroy();
+        StartCoroutine(Destroy_CO());
     }
+
+   private IEnumerator Destroy_CO()
+   {
+       yield return new WaitForSeconds(5f);
+       Destroy(gameObject);
+   }
 }
