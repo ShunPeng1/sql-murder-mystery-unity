@@ -20,7 +20,7 @@ public class InfoPanel : PersistentSingleton<InfoPanel>
         Show();
         foreach (var light in lights)
         {
-            lightTweens.Add(light.DORotate(new Vector3(0, 0, Random.Range(-40, 40)), Random.Range(5, 10))
+            lightTweens.Add(light.DORotate(new Vector3(0, 0, Random.Range(-40, 40)), Random.Range(5, 7))
                     .SetEase(Ease.InOutCubic)
                     .SetSpeedBased(true));
         }
@@ -40,7 +40,7 @@ public class InfoPanel : PersistentSingleton<InfoPanel>
             if (lightTweens[i].IsPlaying()) continue;
             lightTweens[i].Complete();
             lightTweens[i] = lights[i]
-                .DORotate(new Vector3(0, 0, Random.Range(-40, 40)), Random.Range(5, 10))
+                .DORotate(new Vector3(0, 0, Random.Range(-40, 40)), Random.Range(5, 7))
                 .SetEase(Ease.InOutCubic)
                 .SetSpeedBased(true);
         }

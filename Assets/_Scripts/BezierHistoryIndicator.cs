@@ -35,12 +35,12 @@ public class BezierHistoryIndicator : MonoBehaviour
     {
         if (tablePointTop == null) return;
         List<Vector3> topList = new List<Vector3>();
+        List<Vector3> bottomList = new List<Vector3>();
 
         DOCurve.CubicBezier.GetSegmentPointCloud(topList, tablePointTop.position,
             tablePointTop.position + topStartControl, itemPointTop.position,
             itemPointTop.position + topEndControl, 20);
 
-        List<Vector3> bottomList = new List<Vector3>();
         DOCurve.CubicBezier.GetSegmentPointCloud(bottomList, tablePointBottom.position,
             tablePointBottom.position + bottomStartControl, itemPointBottom.position,
             itemPointBottom.position + bottomEndControl, 20);

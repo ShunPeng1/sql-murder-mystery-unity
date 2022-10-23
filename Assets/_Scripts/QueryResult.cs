@@ -158,7 +158,11 @@ public class QueryResult : MonoBehaviour
         historyIndicator.UpdateShape();
         historyIndicator.transform.SetParent(transform);
         var tween = transform.DOMoveX(20, moveTime).SetEase(Ease.InCubic);
-        while (tween.IsPlaying()) yield return null;
+        while (tween.IsPlaying())
+        {
+            historyIndicator.UpdateShape();
+            yield return null;
+        }
         historyIndicator.transform.SetParent(null);
 
         gameObject.SetActive(false);
