@@ -60,16 +60,7 @@ public class SQLQueryBox : PersistentSingleton<SQLQueryBox>
     {
         StringBuilder stringBuilder = new StringBuilder(query);
 
-        var keywords = ResourceManager.Instance.GetKeywordIndicesAndLengths(query, SpecialType.Keyword);
-        var names = ResourceManager.Instance.GetKeywordIndicesAndLengths(query, SpecialType.Name);
-        var strings = ResourceManager.Instance.GetKeywordIndicesAndLengths(query, SpecialType.String);
-        var numbers = ResourceManager.Instance.GetKeywordIndicesAndLengths(query, SpecialType.Number);
-
-        List<SpecialWord> list = new List<SpecialWord>();
-        list.AddRange(keywords);
-        list.AddRange(names);
-        list.AddRange(strings);
-        list.AddRange(numbers);
+        var list = ResourceManager.Instance.GetKeywordIndicesAndLengths(query);
         list.Sort((a, b) => a.Index < b.Index ? 1 : -1);
 
         foreach (var word in list)

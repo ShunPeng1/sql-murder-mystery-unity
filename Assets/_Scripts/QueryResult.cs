@@ -41,13 +41,12 @@ public class QueryResult : MonoBehaviour
     private bool doneInit = false;
 
     private List<List<string>> queryResult;
-    private int initRowCount = 50;
-    private int maxRowCount = 50;
+    private int maxRowCount = 69;
     float widthSoFar = 0f;
     float heightSoFar = 0f;
     List<float> widths;
     List<float> heights;
-    
+
     private IEnumerator Show_CO()
     {
         while (IsCurrentResultAnimating || !doneInit) yield return null;
@@ -163,6 +162,7 @@ public class QueryResult : MonoBehaviour
             historyIndicator.UpdateShape();
             yield return null;
         }
+
         historyIndicator.transform.SetParent(null);
 
         gameObject.SetActive(false);
@@ -174,7 +174,13 @@ public class QueryResult : MonoBehaviour
 
     public void Init(string query, List<List<string>> result, int index)
     {
-        queryResult = result;
+        if (result.Count > maxRowCount)
+        {
+            queryResult = result.GetRange(0, maxRowCount);
+            queryResult.Add(Enumerable.Repeat("...", queryResult[0].Count).ToList());
+        }
+        else queryResult = result;
+
         StartCoroutine(Init_CO(query, result, index));
     }
 
@@ -193,8 +199,50 @@ public class QueryResult : MonoBehaviour
         maxSize = ResourceManager.Instance.QueryResultRect.GetComponent<RectTransform>().sizeDelta;
 
         widths = Enumerable.Repeat(0f, queryResult[0].Count).ToList();
-        heights = Enumerable.Repeat(0f, maxRowCount).ToList();
-        yield return AddNewRow_CO(0, initRowCount);
+        heights = Enumerable.Repeat(0f, queryResult.Count).ToList();
+
+        float extendWidth = queryResult[0].Count switch
+        {
+            1 => 1500f,
+            2 => 1000f,
+            3 => 700f,
+            4 => 500f,
+            _ => -1
+        };
+
+        for (var row = 0; row < queryResult.Count; row++)
+        {
+            cells.Add(new List<Cell>());
+            for (var col = 0; col < queryResult[row].Count; col++)
+            {
+                var cell = ResourceManager.Instance.GetCell();
+                cell.transform.SetParent(scrollRect.content);
+                if (extendWidth > 0) cell.ExtendWidth(extendWidth);
+                var size = cell.InitText(queryResult[row][col], row == 0);
+                cells[row].Add(cell);
+                widths[col] = Mathf.Max(widths[col], size.x);
+                heights[row] = Mathf.Max(heights[row], size.y);
+            }
+
+            if (row % 4 == 3) yield return null;
+        }
+
+        for (var row = 0; row < queryResult.Count; row++)
+        {
+            widthSoFar = 0f;
+
+            for (var col = 0; col < queryResult[row].Count; col++)
+            {
+                cells[row][col].RectTransform.anchoredPosition = new Vector2(widthSoFar, -heightSoFar);
+                cells[row][col].RectTransform.localScale = Vector3.one;
+                cells[row][col].InitSize(widths[col], heights[row]);
+                widthSoFar += widths[col] + VisualManager.Instance.Padding * 2;
+            }
+
+            heightSoFar += heights[row] + VisualManager.Instance.Padding * 2;
+        }
+
+        scrollRect.content.sizeDelta = new Vector2(widthSoFar, heightSoFar);
 
         var outerRectangleSize = new Vector2(Mathf.Min(widthSoFar + margin, maxSize.x),
             Mathf.Min(heightSoFar + margin, maxSize.y));
@@ -214,67 +262,21 @@ public class QueryResult : MonoBehaviour
         initAnchorPos = rectTransform.anchoredPosition;
         rectanglesHeightDelta = outerRectangle.Height - innerRectangle.Height;
 
-        rectTransform.anchoredPosition = Vector2.right * 100000;
+        if (index != -1) rectTransform.anchoredPosition = Vector2.right * 100000;
+        else
+        {
+            outerRectangle.CornerRadii = Vector4.one * 10;
+            rectTransform.position = new Vector3(-30, rectTransform.position.y);
+            rectTransform.DOAnchorPosX(0, 1f)
+                .SetEase(Ease.OutCubic)
+                .OnComplete(() =>
+                {
+                    rectTransform.DOMoveX(-30, 1f).SetEase(Ease.InCubic).SetDelay(3f);
+                });
+            Destroy(gameObject, 5f);
+        }
 
         doneInit = true;
-        StartCoroutine(ContinuouslyAddNewRow_CO());
-    }
-
-    private IEnumerator ContinuouslyAddNewRow_CO()
-    {
-        while (cells.Count < maxRowCount)
-        {
-            yield return AddNewRow_CO(cells.Count, cells.Count + 2);
-        }
-    }
-
-    IEnumerator AddNewRow_CO(int from, int to)
-    {
-        float extendWidth = queryResult[0].Count switch
-        {
-            1 => 2000f,
-            2 => 1500f,
-            3 => 100f,
-            4 => 700f,
-            5 => 500f,
-            _ => -1
-        };
-
-        if (to > queryResult.Count) to = queryResult.Count;
-        
-        for (var row = from; row < to; row++)
-        {
-            cells.Add(new List<Cell>());
-            for (var col = 0; col < queryResult[row].Count; col++)
-            {
-                var cell = ResourceManager.Instance.GetCell();
-                cell.transform.SetParent(scrollRect.content);
-                if (extendWidth > 0) cell.ExtendWidth(extendWidth);
-                var size = cell.InitText(queryResult[row][col], row == 0);
-                cells[row].Add(cell);
-                widths[col] = Mathf.Max(widths[col], size.x);
-                heights[row] = Mathf.Max(heights[row], size.y);
-            }
-
-            if (row % 4 == 3) yield return null;
-        }
-
-        for (var row = from; row < to; row++)
-        {
-            widthSoFar = 0f;
-
-            for (var col = 0; col < queryResult[row].Count; col++)
-            {
-                cells[row][col].RectTransform.anchoredPosition = new Vector2(widthSoFar, -heightSoFar);
-                cells[row][col].RectTransform.localScale = Vector3.one;
-                cells[row][col].InitSize(widths[col], heights[row]);
-                widthSoFar += widths[col] + VisualManager.Instance.Padding * 2;
-            }
-
-            heightSoFar += heights[row] + VisualManager.Instance.Padding * 2;
-        }
-
-        scrollRect.content.sizeDelta = new Vector2(widthSoFar, heightSoFar);
     }
 
     public void Show()
@@ -293,7 +295,7 @@ public class QueryResult : MonoBehaviour
 
     public void Hide()
     {
-        StartCoroutine(Hide_CO(HistoryList.Instance.JustCreated));
+        if (gameObject.activeInHierarchy) StartCoroutine(Hide_CO(HistoryList.Instance.JustCreated));
     }
 
     public void Destroy()

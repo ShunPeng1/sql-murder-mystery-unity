@@ -22,9 +22,10 @@ public class HistoryList : PersistentSingleton<HistoryList>
         historyItem.transform.SetParent(scrollRect.content);
 
         var itemRect = historyItem.GetComponent<RectTransform>();
-        itemRect.anchoredPosition = Vector2.zero;
+        itemRect.anchoredPosition = Vector2.right * 500; 
         itemRect.localScale = Vector3.one;
-
+        itemRect.DOAnchorPosX(0, 0.1f).SetDelay(0.5f);
+        
         foreach (var item in historyItems)
         {
             var rect = item.GetComponent<RectTransform>();

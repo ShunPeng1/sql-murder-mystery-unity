@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Data;
+using DG.Tweening;
 using Mono.Data.Sqlite;
 using UnityEngine.Networking;
 
@@ -12,9 +13,10 @@ public class GameManager : MonoBehaviour
 
     public event Action<int> HistoryChosen;
     [HideInInspector] public int ResultCount = 0;
-    
+
     private GameObject errorMessage;
-    
+
+    private bool isFullscreen = false;
     private void Awake()
     {
         Instance = this;
@@ -31,10 +33,18 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F11))
         {
-            Screen.fullScreen = !Screen.fullScreen;
-
-            if (Screen.fullScreen) Screen.SetResolution(1920, 1080, true);
-            else Screen.SetResolution(1280, 720, false);
+            if (!isFullscreen)
+            {
+                //Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
+                Screen.SetResolution(1920, 1080, FullScreenMode.FullScreenWindow);
+                isFullscreen = true;
+            }
+            else
+            {
+                //Screen.fullScreenMode = FullScreenMode.Windowed;
+                Screen.SetResolution(1280, 720, FullScreenMode.Windowed);
+                isFullscreen = false;
+            }
         }
     }
 
@@ -87,16 +97,18 @@ public class GameManager : MonoBehaviour
         queryResult.transform.SetParent(canvasTransform);
         queryResult.transform.SetSiblingIndex(0);
         queryResult.transform.localScale = Vector3.one;
-        queryResult.Init(query, result, ResultCount);
 
         if (record)
         {
+            queryResult.Init(query, result, ResultCount);
             HistoryList.Instance.CreateHistoryItem(queryResult);
             OnHistoryChosen(ResultCount);
             ResultCount++;
         }
         else
         {
+            QueryResult.ShowingResult = null;
+            queryResult.Init(query, result, -1);
             OnHistoryChosen(-1);
             errorMessage = queryResult.gameObject;
         }
@@ -108,7 +120,10 @@ public class GameManager : MonoBehaviour
 
         if (errorMessage != null)
         {
-            Destroy(errorMessage);
+            errorMessage.transform.DOMoveX(-10, 1f)
+                .SetEase(Ease.OutCubic)
+                .SetRelative(true)
+                .OnComplete(() => Destroy(errorMessage));
             errorMessage = null;
         }
     }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using TMPro;
 using UnityEngine;
 
 
@@ -22,82 +23,62 @@ public class ResourceManager : PersistentSingleton<ResourceManager>
         "person"
     };
 
-    [HideInInspector] public string[] SQLKeywords = new[]
+    private string[] SQLKeywords = new[]
     {
         "ADD",
-        "ADD CONSTRAINT",
         "ALL",
         "ALTER",
-        "ALTER COLUMN",
-        "ALTER TABLE",
         "AND",
         "ANY",
         "AS",
         "ASC",
-        "BACKUP DATABASE",
         "BETWEEN",
+        "BY",
         "CASE",
         "CHECK",
         "COLUMN",
         "CONSTRAINT",
         "CREATE",
-        "CREATE DATABASE",
-        "CREATE INDEX",
-        "CREATE OR REPLACE VIEW",
-        "CREATE TABLE",
-        "CREATE PROCEDURE",
-        "CREATE UNIQUE INDEX",
-        "CREATE VIEW",
         "DATABASE",
         "DEFAULT",
         "DELETE",
         "DESC",
         "DISTINCT",
         "DROP",
-        "DROP COLUMN",
-        "DROP CONSTRAINT",
-        "DROP DATABASE",
-        "DROP DEFAULT",
-        "DROP INDEX",
-        "DROP TABLE",
-        "DROP VIEW",
         "EXEC",
         "EXISTS",
-        "FOREIGN KEY",
+        "FOREIGN",
         "FROM",
-        "FULL OUTER JOIN",
-        "GROUP BY",
+        "FULL",
+        "GROUP",
         "HAVING",
         "IN",
         "INDEX",
-        "INNER JOIN",
-        "INSERT INTO",
-        "INSERT INTO SELECT",
-        "IS NULL",
-        "IS NOT NULL",
+        "INNER",
+        "IS",
+        "INTO",
+        "NULL",
         "JOIN",
-        "LEFT JOIN",
+        "LEFT",
         "LIKE",
         "LIMIT",
+        "KEY",
         "NOT",
-        "NOT NULL",
         "OR",
-        "ORDER BY",
-        "OUTER JOIN",
-        "PRIMARY KEY",
+        "ON",
+        "ORDER",
+        "OUTER",
+        "PRIMARY",
         "PROCEDURE",
-        "RIGHT JOIN",
+        "REPLACE",
+        "RIGHT",
         "ROWNUM",
         "SELECT",
-        "SELECT DISTINCT",
-        "SELECT INTO",
-        "SELECT TOP",
         "SET",
         "TABLE",
         "TOP",
-        "TRUNCATE TABLE",
+        "TRUNCATE",
         "UNION",
-        "UNION ALL",
         "UNIQUE",
         "UPDATE",
         "VALUES",
@@ -172,103 +153,138 @@ public class ResourceManager : PersistentSingleton<ResourceManager>
         }
     }
 
-    public List<SpecialWord> GetKeywordIndicesAndLengths(string query, SpecialType specialType)
+    public List<SpecialWord> GetKeywordIndicesAndLengths(string _query)
     {
         List<SpecialWord> specialWords = new List<SpecialWord>();
 
-        if (specialType == SpecialType.String)
+        var query = _query.ToCharArray();
+        int stringIndex = 0;
+        char stringIndicator = '~';
+        for (int i = 0; i < query.Length; i++)
         {
-            int stringIndex = 0;
-            char stringIndicator = '~';
-            for (int i = 0; i < query.Length; i++)
+            if (query[i] == '\'')
             {
-                if (query[i] == '\'')
+                if (stringIndicator == '\'')
                 {
-                    if (stringIndicator == '\'')
-                    {
-                        specialWords.Add(new SpecialWord(stringIndex, i - stringIndex + 1,
-                            SpecialType.String));
-                        stringIndicator = '~';
-                    }
-                    else
-                    {
-                        stringIndex = i;
-                        stringIndicator = '\'';
-                    }
-                }
-                else if (query[i] == '"')
-                {
-                    if (stringIndicator == '"')
-                    {
-                        specialWords.Add(new SpecialWord(stringIndex, i - stringIndex + 1,
-                            SpecialType.String));
-                        stringIndicator = '~';
-                    }
-                    else
-                    {
-                        stringIndex = i;
-                        stringIndicator = '"';
-                    }
-                }
-            }
+                    specialWords.Add(new SpecialWord(stringIndex, i - stringIndex + 1,
+                        SpecialType.String));
 
-            if (stringIndicator is ' ' or '\n' or '"' or '\'')
-                specialWords.Add(new SpecialWord(stringIndex, query.Length - stringIndex,
-                    SpecialType.String));
-        }
-        else if (specialType == SpecialType.Number)
-        {
-            int numberIndex = 0;
-            bool lastNumNumeric = false;
-            for (int i = 0; i < query.Length; i++)
-            {
-                if (IsNumeric(query[i]))
-                {
-                    if (!lastNumNumeric)
+                    for (int j = stringIndex; j < i + 1; j++)
                     {
-                        numberIndex = i;
+                        query[j] = '~';
                     }
 
-                    lastNumNumeric = true;
+                    stringIndicator = '~';
                 }
                 else
                 {
-                    if (lastNumNumeric)
-                    {
-                        if (numberIndex > 0 && !IsAlpha(query[numberIndex]) && !IsAlpha(query[i]))
-                            specialWords.Add(new SpecialWord(numberIndex, i - numberIndex,
-                                SpecialType.Number));
-                    }
-
-                    lastNumNumeric = false;
+                    stringIndex = i;
+                    stringIndicator = '\'';
                 }
             }
+            else if (query[i] == '"')
+            {
+                if (stringIndicator == '"')
+                {
+                    specialWords.Add(new SpecialWord(stringIndex, i - stringIndex + 1,
+                        SpecialType.String));
 
-            if (lastNumNumeric)
-                specialWords.Add(new SpecialWord(numberIndex, query.Length - numberIndex,
-                    SpecialType.Number));
+                    for (int j = stringIndex; j < i + 1; j++)
+                    {
+                        query[j] = '~';
+                    }
+
+                    stringIndicator = '~';
+                }
+                else
+                {
+                    stringIndex = i;
+                    stringIndicator = '"';
+                }
+            }
         }
-        else
+
+        if (stringIndicator is ' ' or '\n' or '"' or '\'')
         {
-            if (specialType == SpecialType.Keyword) query = query.ToUpper();
-
-            string[] list = specialType switch
+            specialWords.Add(
+                new SpecialWord(stringIndex, query.Length - stringIndex, SpecialType.String));
+            for (int j = stringIndex; j < query.Length; j++)
             {
-                SpecialType.Keyword => SQLKeywords,
-                SpecialType.Name => SQLTableNames,
-                _ => new string[] { }
-            };
+                query[j] = '~';
+            }
+        }
 
-            foreach (var special in list)
+        int numberIndex = 0;
+        bool lastNumNumeric = false;
+        for (int i = 0; i < query.Length; i++)
+        {
+            if (IsNumeric(query[i]))
             {
-                var index = query.IndexOf(special);
+                if (!lastNumNumeric)
+                {
+                    numberIndex = i;
+                }
+
+                lastNumNumeric = true;
+            }
+            else
+            {
+                if (lastNumNumeric)
+                {
+                    if (((numberIndex > 0 && !IsAlpha(query[numberIndex - 1])) || numberIndex == 0) &&
+                        !IsAlpha(query[i]))
+                        specialWords.Add(new SpecialWord(numberIndex, i - numberIndex,
+                            SpecialType.Number));
+                }
+
+                lastNumNumeric = false;
+            }
+        }
+
+        if (lastNumNumeric &&
+            ((numberIndex > 0 && !IsAlpha(query[numberIndex - 1])) || numberIndex == 0))
+            specialWords.Add(
+                new SpecialWord(numberIndex, query.Length - numberIndex, SpecialType.Number));
+
+        foreach (var special in SQLTableNames)
+        {
+            var indices = AllIndexesOf(query.ArrayToString(), special);
+
+            foreach (var index in indices)
+            {
                 if (index == -1) continue;
 
                 bool start = index == 0 || !IsAlphaNumeric(query[index - 1]);
                 bool end = index + special.Length == query.Length ||
-                           query[index + special.Length] == ' ' || query[index + special.Length] == '\n';
+                           query[index + special.Length] == ' ' ||
+                           query[index + special.Length] == '\n' ||
+                           !IsAlphaNumeric(query[index + special.Length]);
 
-                if (start && end) specialWords.Add(new SpecialWord(index, special.Length, specialType));
+                if (start && end)
+                {
+                    specialWords.Add(new SpecialWord(index, special.Length, SpecialType.Name));
+                }
+            }
+        }
+
+        query = query.ArrayToString().ToUpper().ToCharArray();
+
+        foreach (var special in SQLKeywords)
+        {
+            var indices = AllIndexesOf(query.ArrayToString(), special);
+
+            foreach (var index in indices)
+            {
+                if (index == -1) continue;
+
+                bool start = index == 0 || !IsAlphaNumeric(query[index - 1]);
+                bool end = index + special.Length == query.Length ||
+                           query[index + special.Length] == ' ' ||
+                           query[index + special.Length] == '\n' ||
+                           !IsAlphaNumeric(query[index + special.Length]);
+
+                if (start && end)
+                    specialWords.Add(new SpecialWord(index, special.Length, SpecialType.Keyword));
             }
         }
 
@@ -287,6 +303,17 @@ public class ResourceManager : PersistentSingleton<ResourceManager>
         bool IsAlpha(char c)
         {
             return Regex.IsMatch(c.ToString(), @"^[a-zA-Z_]+$");
+        }
+    }
+
+    public static List<int> AllIndexesOf(string str, string value)
+    {
+        List<int> indexes = new List<int>();
+        for (int index = 0;; index += value.Length)
+        {
+            index = str.IndexOf(value, index);
+            if (index == -1) return indexes;
+            indexes.Add(index);
         }
     }
 }

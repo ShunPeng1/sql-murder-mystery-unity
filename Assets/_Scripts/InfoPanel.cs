@@ -28,7 +28,7 @@ public class InfoPanel : PersistentSingleton<InfoPanel>
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0) && isShowing)
+        if ((Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)) && isShowing)
         {
             Hide();
         }

@@ -16,7 +16,6 @@ public class HistoryItem : MonoBehaviour
     
     public void Init(QueryResult queryResult)
     {
-        
         this.queryResult = queryResult;
         queryResult.HistoryItem = this;
         GameManager.Instance.HistoryChosen += HistoryChosenHandler;
@@ -34,6 +33,12 @@ public class HistoryItem : MonoBehaviour
         {
             if (QueryResult.ShowingResult == queryResult) return;
             queryResult.Show();
+            button.transition = Selectable.Transition.None;
+        }
+        else
+        {
+            queryResult.Hide();
+            button.transition = Selectable.Transition.ColorTint;
         }
     }
 
