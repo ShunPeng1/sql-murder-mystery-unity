@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 using Shapes;
 using TMPro;
 using UnityEngine;
@@ -14,27 +15,140 @@ public class QueryResult : MonoBehaviour
     [SerializeField] private ScrollRect scrollRect;
     [SerializeField] private Rectangle innerRectangle;
     [SerializeField] private Rectangle outerRectangle;
-
+    [SerializeField] private Transform TopPoint;
+    [SerializeField] private Transform BottomPoint;
     private List<List<Cell>> cells = new List<List<Cell>>();
 
     [SerializeField] private float margin;
-    public RectTransform TopPoint;
-    public RectTransform BottomPoint;
+    public HistoryItem HistoryItem;
     private Vector2 maxSize;
+    private RectTransform rectTransform;
+    private BezierHistoryIndicator historyIndicator;
+    private Vector3 initTransformPos;
+    private Vector2 initSizeDelta;
+    private Vector2 initAnchorPos;
+    private float rectanglesHeightDelta;
+
+    [SerializeField] private float expandShrinkTime;
+    [SerializeField] private float moveTime;
 
     public int Index { get; private set; }
     public string Query { get; private set; }
 
-    public static bool IsCurrentResultDoneInit = true;
+    public static QueryResult ShowingResult;
+    public static bool IsCurrentResultAnimating = false;
+    private bool doneInit = false;
+
+    private IEnumerator Show_CO()
+    {
+        while (IsCurrentResultAnimating || !doneInit) yield return null;
+        IsCurrentResultAnimating = true;
+
+        historyIndicator.SetPoint(TopPoint, BottomPoint, HistoryItem.TopPoint, HistoryItem.BottomPoint);
+
+        float timer = expandShrinkTime;
+
+        var historyItemRect = HistoryItem.GetComponent<RectTransform>();
+
+        var historyItemActualHeight = HistoryItem.Background.sizeDelta.y;
+
+        var aSize = initSizeDelta;
+        var bSize = historyItemRect.sizeDelta + Vector2.up * historyItemActualHeight;
+
+        var aPos = initTransformPos;
+        var bPos = historyItemRect.position + Vector3.up * historyItemRect.sizeDelta.y / 100;
+
+        rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, bSize.y);
+        rectTransform.position = new Vector2(rectTransform.position.x + 20,
+            bPos.y + historyItemActualHeight / 200);
+
+        outerRectangle.Height = rectTransform.sizeDelta.y;
+        innerRectangle.Height = rectTransform.sizeDelta.y - rectanglesHeightDelta;
+
+        historyIndicator.transform.DOMoveX(0, moveTime).SetEase(Ease.OutCubic);
+        var tween = transform.DOMoveX(initTransformPos.x, moveTime).SetEase(Ease.OutCubic);
+        while (tween.IsPlaying())
+        {
+            historyIndicator.UpdateShape();
+            yield return null;
+        }
+
+        while (timer > 0)
+        {
+            var t = DOVirtual.EasedValue(0, 1, 1 - timer / expandShrinkTime, Ease.InOutCubic);
+            rectTransform.sizeDelta =
+                new Vector2(rectTransform.sizeDelta.x, Mathf.Lerp(bSize.y, aSize.y, t));
+            rectTransform.position = new Vector2(rectTransform.position.x,
+                Mathf.Lerp(bPos.y, aPos.y, t));
+
+            outerRectangle.Height = rectTransform.sizeDelta.y;
+            innerRectangle.Height = rectTransform.sizeDelta.y - rectanglesHeightDelta;
+
+            historyIndicator.UpdateShape();
+
+            yield return null;
+            timer -= Time.deltaTime;
+        }
+
+        IsCurrentResultAnimating = false;
+        ShowingResult = this;
+    }
+
+    private IEnumerator Hide_CO()
+    {
+        while (IsCurrentResultAnimating) yield return null;
+        IsCurrentResultAnimating = true;
+
+        float timer = expandShrinkTime;
+
+        var historyItemRect = HistoryItem.GetComponent<RectTransform>();
+
+        var historyItemActualHeight = HistoryItem.Background.sizeDelta.y;
+
+        var aSize = rectTransform.sizeDelta;
+        var bSize = historyItemRect.sizeDelta + Vector2.up * historyItemActualHeight;
+
+        var aPos = rectTransform.position;
+        var bPos = historyItemRect.position + Vector3.up * historyItemRect.sizeDelta.y / 100;
+
+        while (timer > 0)
+        {
+            var t = DOVirtual.EasedValue(0, 1, 1 - timer / expandShrinkTime, Ease.InOutCubic);
+            rectTransform.sizeDelta =
+                new Vector2(rectTransform.sizeDelta.x, Mathf.Lerp(aSize.y, bSize.y, t));
+            rectTransform.position = new Vector2(rectTransform.position.x,
+                Mathf.Lerp(aPos.y, bPos.y, t) + historyItemActualHeight / 200);
+
+            outerRectangle.Height = rectTransform.sizeDelta.y;
+            innerRectangle.Height = rectTransform.sizeDelta.y - rectanglesHeightDelta;
+
+            historyIndicator.UpdateShape();
+
+            yield return null;
+            timer -= Time.deltaTime;
+        }
+        
+        
+        historyIndicator.transform.SetParent(transform);
+        var tween = transform.DOMoveX(20, moveTime).SetEase(Ease.InCubic);
+        while (tween.IsPlaying()) yield return null;
+        historyIndicator.transform.SetParent(null);
+
+        gameObject.SetActive(false);
+
+        IsCurrentResultAnimating = false;
+    }
 
     public void Init(string query, List<List<string>> result, int index)
     {
-        IsCurrentResultDoneInit = false;
         StartCoroutine(Init_CO(query, result, index));
     }
 
     private IEnumerator Init_CO(string query, List<List<string>> result, int index)
     {
+        historyIndicator = Instantiate(ResourceManager.Instance.BezierHistoryIndicator)
+            .GetComponent<BezierHistoryIndicator>();
+
         if (result.Count > 100)
         {
             result = result.GetRange(0, 101);
@@ -44,7 +158,7 @@ public class QueryResult : MonoBehaviour
         Query = query;
         Index = index;
 
-        var rectTransform = GetComponent<RectTransform>();
+        rectTransform = GetComponent<RectTransform>();
         rectTransform.SetParent(ResourceManager.Instance.QueryResultRect.transform);
         maxSize = ResourceManager.Instance.QueryResultRect.GetComponent<RectTransform>().sizeDelta;
 
@@ -109,33 +223,26 @@ public class QueryResult : MonoBehaviour
         innerRectangle.Width = outerRectangleSize.x - margin;
         innerRectangle.Height = outerRectangleSize.y - margin;
 
-        IsCurrentResultDoneInit = true;
+        initTransformPos = rectTransform.position;
+        initSizeDelta = rectTransform.sizeDelta;
+        initAnchorPos = rectTransform.anchoredPosition;
+        rectanglesHeightDelta = outerRectangle.Height - innerRectangle.Height;
+
+        doneInit = true;
+        //transform.position = Vector3.right * 100;
     }
 
-    public void Show(Vector2 topPoint, Vector2 bottomPoint)
+    public void Show()
     {
+        if (ShowingResult != this && ShowingResult != null) ShowingResult.Hide();
+        
         gameObject.SetActive(true);
-        StartCoroutine(ShowIndicator_CO(topPoint, bottomPoint));
-    }
-
-    private IEnumerator ShowIndicator_CO(Vector2 topPoint, Vector2 bottomPoint)
-    {
-        while (!IsCurrentResultDoneInit)
-        {
-            yield return null;
-        }
-
-        var historyIndicator = Instantiate(ResourceManager.Instance.BezierHistoryIndicator)
-            .GetComponent<BezierHistoryIndicator>();
-
-        historyIndicator.SetPoint(TopPoint.position, BottomPoint.position, topPoint, bottomPoint);
-
-        GameManager.Instance.SetNewIndicator(historyIndicator);
+        StartCoroutine(Show_CO());
     }
 
     public void Hide()
     {
-        gameObject.SetActive(false);
+        StartCoroutine(Hide_CO());
     }
 
     public void Destroy()

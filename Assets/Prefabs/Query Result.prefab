@@ -450,9 +450,12 @@ MonoBehaviour:
   scrollRect: {fileID: 514518214631854470}
   innerRectangle: {fileID: 8755765445379184542}
   outerRectangle: {fileID: 1067173043948011605}
-  margin: 20
   TopPoint: {fileID: 305109145793488424}
   BottomPoint: {fileID: 839870600102237701}
+  margin: 20
+  HistoryItem: {fileID: 0}
+  expandShrinkTime: 0.5
+  moveTime: 0.5
 --- !u!1 &4278206372632066848
 GameObject:
   m_ObjectHideFlags: 0

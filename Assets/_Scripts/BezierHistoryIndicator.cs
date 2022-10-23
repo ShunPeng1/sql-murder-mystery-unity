@@ -15,18 +15,34 @@ public class BezierHistoryIndicator : MonoBehaviour
     [SerializeField] private Vector3 bottomStartControl;
     [SerializeField] private Vector3 bottomEndControl;
 
-    public void SetPoint(Vector3 tablePointTop, Vector3 tablePointBottom, Vector3 itemPointTop,
-        Vector3 itemPointBottom)
+    private Transform tablePointTop;
+    private Transform tablePointBottom;
+    private Transform itemPointTop;
+    private Transform itemPointBottom;
+
+    public void SetPoint(Transform tablePointTop, Transform tablePointBottom, Transform itemPointTop,
+        Transform itemPointBottom)
+    {
+        this.tablePointTop = tablePointTop;
+        this.tablePointBottom = tablePointBottom;
+        this.itemPointTop = itemPointTop;
+        this.itemPointBottom = itemPointBottom;
+
+        UpdateShape();
+    }
+
+    public void UpdateShape()
     {
         List<Vector3> topList = new List<Vector3>();
 
-        DOCurve.CubicBezier.GetSegmentPointCloud(topList, tablePointTop, tablePointTop + topStartControl,
-            itemPointTop, itemPointTop + topEndControl, 20);
+        DOCurve.CubicBezier.GetSegmentPointCloud(topList, tablePointTop.position,
+            tablePointTop.position + topStartControl, itemPointTop.position,
+            itemPointTop.position + topEndControl, 20);
 
         List<Vector3> bottomList = new List<Vector3>();
-        DOCurve.CubicBezier.GetSegmentPointCloud(bottomList, tablePointBottom,
-            tablePointBottom + bottomStartControl, itemPointBottom, itemPointBottom + bottomEndControl,
-            20);
+        DOCurve.CubicBezier.GetSegmentPointCloud(bottomList, tablePointBottom.position,
+            tablePointBottom.position + bottomStartControl, itemPointBottom.position,
+            itemPointBottom.position + bottomEndControl, 20);
 
         bottomList.Reverse();
 

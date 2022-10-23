@@ -12,9 +12,7 @@ public class GameManager : MonoBehaviour
 
     public event Action<int> HistoryChosen;
     [HideInInspector] public int ResultCount = 0;
-
-    public BezierHistoryIndicator BezierHistoryIndicator;
-
+    
     private GameObject errorMessage;
     
     private void Awake()
@@ -102,15 +100,5 @@ public class GameManager : MonoBehaviour
             Destroy(errorMessage);
             errorMessage = null;
         }
-    }
-
-    public void SetNewIndicator(BezierHistoryIndicator indicator)
-    {
-        if (BezierHistoryIndicator != null)
-        {
-            Destroy(BezierHistoryIndicator.gameObject);
-        }
-        
-        BezierHistoryIndicator = indicator;
     }
 }

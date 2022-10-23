@@ -174,10 +174,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97b6256548258da4c9c6f4235cf24ab5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Background: {fileID: 2086839612298503635}
   button: {fileID: 3195130384655299151}
   text: {fileID: 3195130386300113121}
-  topPoint: {fileID: 1974953741968772599}
-  bottomPoint: {fileID: 3595971275417537084}
+  TopPoint: {fileID: 1974953741968772599}
+  BottomPoint: {fileID: 3595971275417537084}
 --- !u!1 &3195130386300113127
 GameObject:
   m_ObjectHideFlags: 0

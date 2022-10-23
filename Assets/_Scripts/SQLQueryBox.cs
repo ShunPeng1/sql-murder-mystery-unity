@@ -50,8 +50,8 @@ public class SQLQueryBox : PersistentSingleton<SQLQueryBox>
 
     private void OnSubmit()
     {
-        if (QueryResult.IsCurrentResultDoneInit)
-            GameManager.Instance.ExecuteQuery(inputField.text);
+        if (QueryResult.IsCurrentResultAnimating) return;
+        GameManager.Instance.ExecuteQuery(inputField.text);
     }
 
     private string SQLBeautifier(string query)

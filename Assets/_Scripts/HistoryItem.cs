@@ -8,14 +8,16 @@ using UnityEngine.UI;
 public class HistoryItem : MonoBehaviour
 {
     private QueryResult queryResult;
+    public RectTransform Background;
     [SerializeField] private Button button;
     [SerializeField] private TMP_Text text;
-    [SerializeField] private RectTransform topPoint;
-    [SerializeField] private RectTransform bottomPoint;
+    public RectTransform TopPoint;
+    public RectTransform BottomPoint;
 
     public void Init(QueryResult queryResult)
     {
         this.queryResult = queryResult;
+        queryResult.HistoryItem = this;
         GameManager.Instance.HistoryChosen += HistoryChosenHandler;
         button.onClick.AddListener(() => GameManager.Instance.OnHistoryChosen(queryResult.Index));
 
@@ -27,8 +29,7 @@ public class HistoryItem : MonoBehaviour
 
     private void HistoryChosenHandler(int index)
     {
-        if (index == queryResult.Index) queryResult.Show(topPoint.position, bottomPoint.position);
-        else queryResult.Hide();
+        if (index == queryResult.Index) queryResult.Show();
     }
 
     private void OnDestroy()
