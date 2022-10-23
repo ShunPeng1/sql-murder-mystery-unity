@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
@@ -10,7 +11,8 @@ public class HistoryList : PersistentSingleton<HistoryList>
     [SerializeField] private ScrollRect scrollRect;
     private List<HistoryItem> historyItems = new List<HistoryItem>();
     private float actualWidth;
-    
+    public bool JustCreated;
+
     public void CreateHistoryItem(QueryResult queryResult)
     {
         var historyItem = Instantiate(ResourceManager.Instance.HistoryItem).GetComponent<HistoryItem>();
@@ -35,5 +37,14 @@ public class HistoryList : PersistentSingleton<HistoryList>
             Destroy(historyItems[0].gameObject);
             historyItems.RemoveAt(0);
         }
+
+        StartCoroutine(JustCreatedExpire_CO());
+    }
+    
+    private IEnumerator JustCreatedExpire_CO()
+    {
+        JustCreated = true;
+        yield return new WaitForSeconds(1f);
+        JustCreated = false;
     }
 }

@@ -31,6 +31,7 @@ public class QueryResult : MonoBehaviour
 
     [SerializeField] private float expandShrinkTime;
     [SerializeField] private float moveTime;
+    [SerializeField] private float pauseTime;
 
     public int Index { get; private set; }
     public string Query { get; private set; }
@@ -43,6 +44,9 @@ public class QueryResult : MonoBehaviour
     {
         while (IsCurrentResultAnimating || !doneInit) yield return null;
         IsCurrentResultAnimating = true;
+
+        rectTransform.anchoredPosition = Vector2.zero;
+        historyIndicator.transform.position = Vector3.zero;
 
         historyIndicator.SetPoint(TopPoint, BottomPoint, HistoryItem.TopPoint, HistoryItem.BottomPoint);
 
@@ -73,6 +77,13 @@ public class QueryResult : MonoBehaviour
             yield return null;
         }
 
+        float pauseTimer = pauseTime;
+        while (pauseTimer > 0)
+        {
+            yield return null;
+            pauseTimer -= Time.deltaTime;
+        }
+
         while (timer > 0)
         {
             var t = DOVirtual.EasedValue(0, 1, 1 - timer / expandShrinkTime, Ease.InOutCubic);
@@ -91,10 +102,9 @@ public class QueryResult : MonoBehaviour
         }
 
         IsCurrentResultAnimating = false;
-        ShowingResult = this;
     }
 
-    private IEnumerator Hide_CO()
+    private IEnumerator Hide_CO(bool justCreated)
     {
         while (IsCurrentResultAnimating) yield return null;
         IsCurrentResultAnimating = true;
@@ -109,7 +119,8 @@ public class QueryResult : MonoBehaviour
         var bSize = historyItemRect.sizeDelta + Vector2.up * historyItemActualHeight;
 
         var aPos = rectTransform.position;
-        var bPos = historyItemRect.position + Vector3.up * historyItemRect.sizeDelta.y / 100;
+        var bPos = historyItemRect.position +
+                   Vector3.up * historyItemRect.sizeDelta.y / 100 * (justCreated ? 2 : 1);
 
         while (timer > 0)
         {
@@ -127,8 +138,16 @@ public class QueryResult : MonoBehaviour
             yield return null;
             timer -= Time.deltaTime;
         }
-        
-        
+
+        float pauseTimer = pauseTime;
+        while (pauseTimer > 0)
+        {
+            historyIndicator.UpdateShape();
+            yield return null;
+            pauseTimer -= Time.deltaTime;
+        }
+
+        historyIndicator.UpdateShape();
         historyIndicator.transform.SetParent(transform);
         var tween = transform.DOMoveX(20, moveTime).SetEase(Ease.InCubic);
         while (tween.IsPlaying()) yield return null;
@@ -136,6 +155,8 @@ public class QueryResult : MonoBehaviour
 
         gameObject.SetActive(false);
 
+        scrollRect.content.anchoredPosition = Vector2.zero;
+        
         IsCurrentResultAnimating = false;
     }
 
@@ -148,6 +169,7 @@ public class QueryResult : MonoBehaviour
     {
         historyIndicator = Instantiate(ResourceManager.Instance.BezierHistoryIndicator)
             .GetComponent<BezierHistoryIndicator>();
+        historyIndicator.transform.position = Vector3.right * 100;
 
         if (result.Count > 100)
         {
@@ -160,6 +182,7 @@ public class QueryResult : MonoBehaviour
 
         rectTransform = GetComponent<RectTransform>();
         rectTransform.SetParent(ResourceManager.Instance.QueryResultRect.transform);
+        rectTransform.anchoredPosition = Vector2.right * 100000;
         maxSize = ResourceManager.Instance.QueryResultRect.GetComponent<RectTransform>().sizeDelta;
 
         List<float> widths = Enumerable.Repeat(0f, result[0].Count).ToList();
@@ -189,7 +212,7 @@ public class QueryResult : MonoBehaviour
                 heights[row] = Mathf.Max(heights[row], size.y);
             }
 
-            if (row % 10 == 9) yield return null;
+            if (row % 5 == 4) yield return null;
         }
 
         float widthSoFar = 0f;
@@ -228,21 +251,28 @@ public class QueryResult : MonoBehaviour
         initAnchorPos = rectTransform.anchoredPosition;
         rectanglesHeightDelta = outerRectangle.Height - innerRectangle.Height;
 
+        rectTransform.anchoredPosition = Vector2.right * 100000;
+
         doneInit = true;
-        //transform.position = Vector3.right * 100;
     }
 
     public void Show()
     {
-        if (ShowingResult != this && ShowingResult != null) ShowingResult.Hide();
-        
-        gameObject.SetActive(true);
-        StartCoroutine(Show_CO());
+        if (ShowingResult != this && ShowingResult != null)
+            ShowingResult.Hide(HistoryList.Instance.JustCreated);
+
+        if (ShowingResult != this)
+        {
+            gameObject.SetActive(true);
+            StartCoroutine(Show_CO());
+        }
+
+        ShowingResult = this;
     }
 
-    public void Hide()
+    public void Hide(bool justCreated)
     {
-        StartCoroutine(Hide_CO());
+        StartCoroutine(Hide_CO(justCreated));
     }
 
     public void Destroy()

@@ -454,8 +454,9 @@ MonoBehaviour:
   BottomPoint: {fileID: 839870600102237701}
   margin: 20
   HistoryItem: {fileID: 0}
-  expandShrinkTime: 0.5
-  moveTime: 0.5
+  expandShrinkTime: 0.4
+  moveTime: 0.4
+  pauseTime: 0.1
 --- !u!1 &4278206372632066848
 GameObject:
   m_ObjectHideFlags: 0

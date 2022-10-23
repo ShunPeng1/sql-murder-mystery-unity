@@ -13,9 +13,10 @@ public class HistoryItem : MonoBehaviour
     [SerializeField] private TMP_Text text;
     public RectTransform TopPoint;
     public RectTransform BottomPoint;
-
+    
     public void Init(QueryResult queryResult)
     {
+        
         this.queryResult = queryResult;
         queryResult.HistoryItem = this;
         GameManager.Instance.HistoryChosen += HistoryChosenHandler;
@@ -29,7 +30,11 @@ public class HistoryItem : MonoBehaviour
 
     private void HistoryChosenHandler(int index)
     {
-        if (index == queryResult.Index) queryResult.Show();
+        if (index == queryResult.Index)
+        {
+            if (QueryResult.ShowingResult == queryResult) return;
+            queryResult.Show();
+        }
     }
 
     private void OnDestroy()
