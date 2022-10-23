@@ -21,10 +21,11 @@ public class Cell : MonoBehaviour
         textRect.sizeDelta = new Vector2(newWidth, textRect.sizeDelta.y);
     }
 
-    public Vector2 InitText(string data)
+    public Vector2 InitText(string data, bool isHeader)
     {
         data = string.Join(" ", data.Split(new[] {' ', '\n'}, StringSplitOptions.RemoveEmptyEntries));
         text.SetText(data);
+        if (isHeader) text.fontStyle = FontStyles.Bold;
         text.ForceMeshUpdate(true);
         return text.textBounds.size;
     }

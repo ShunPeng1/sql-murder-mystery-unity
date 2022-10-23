@@ -27,6 +27,17 @@ public class GameManager : MonoBehaviour
         dbConnection.Open();
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F11))
+        {
+            Screen.fullScreen = !Screen.fullScreen;
+
+            if (Screen.fullScreen) Screen.SetResolution(1920, 1080, true);
+            else Screen.SetResolution(1280, 720, false);
+        }
+    }
+
     public void ExecuteQuery(string query)
     {
         if (query == string.Empty) return;
