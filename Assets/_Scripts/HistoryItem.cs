@@ -13,7 +13,7 @@ public class HistoryItem : MonoBehaviour
     [SerializeField] private TMP_Text text;
     public RectTransform TopPoint;
     public RectTransform BottomPoint;
-    
+    private Color initColor;
     public void Init(QueryResult queryResult)
     {
         this.queryResult = queryResult;
@@ -25,6 +25,8 @@ public class HistoryItem : MonoBehaviour
             queryResult.Query.Split(new[] {' ', '\n'}, StringSplitOptions.RemoveEmptyEntries));
 
         if (text.text.Length > 25) text.text = text.text.Substring(0, 25) + "...";
+
+        initColor = button.targetGraphic.color;
     }
 
     private void HistoryChosenHandler(int index)
@@ -34,6 +36,7 @@ public class HistoryItem : MonoBehaviour
             if (QueryResult.ShowingResult == queryResult) return;
             queryResult.Show();
             button.transition = Selectable.Transition.None;
+            button.targetGraphic.color = initColor;
         }
         else
         {

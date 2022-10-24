@@ -13,6 +13,7 @@ public class HistoryList : PersistentSingleton<HistoryList>
     private List<HistoryItem> historyItems = new List<HistoryItem>();
     private float actualWidth;
     public bool JustCreated;
+    [SerializeField] private float heightMargin;
 
     public void CreateHistoryItem(QueryResult queryResult)
     {
@@ -22,10 +23,10 @@ public class HistoryList : PersistentSingleton<HistoryList>
         historyItem.transform.SetParent(scrollRect.content);
 
         var itemRect = historyItem.GetComponent<RectTransform>();
-        itemRect.anchoredPosition = Vector2.right * 500; 
+        itemRect.anchoredPosition = new Vector2(500, heightMargin);
         itemRect.localScale = Vector3.one;
         itemRect.DOAnchorPosX(0, 0.1f).SetDelay(0.5f);
-        
+
         foreach (var item in historyItems)
         {
             var rect = item.GetComponent<RectTransform>();
@@ -42,7 +43,7 @@ public class HistoryList : PersistentSingleton<HistoryList>
 
         StartCoroutine(JustCreatedExpire_CO());
     }
-    
+
     private IEnumerator JustCreatedExpire_CO()
     {
         JustCreated = true;

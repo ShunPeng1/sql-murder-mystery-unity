@@ -39,11 +39,11 @@ public class BezierHistoryIndicator : MonoBehaviour
 
         DOCurve.CubicBezier.GetSegmentPointCloud(topList, tablePointTop.position,
             tablePointTop.position + topStartControl, itemPointTop.position,
-            itemPointTop.position + topEndControl, 20);
+            itemPointTop.position + topEndControl, 30);
 
         DOCurve.CubicBezier.GetSegmentPointCloud(bottomList, tablePointBottom.position,
             tablePointBottom.position + bottomStartControl, itemPointBottom.position,
-            itemPointBottom.position + bottomEndControl, 20);
+            itemPointBottom.position + bottomEndControl, 30);
 
         bottomList.Reverse();
 

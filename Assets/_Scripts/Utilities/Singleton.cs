@@ -34,3 +34,4 @@ public abstract class PersistentSingleton<T> : Singleton<T> where T : MonoBehavi
         base.Awake();
     }
 }
+

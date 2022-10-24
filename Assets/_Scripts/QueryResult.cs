@@ -181,6 +181,8 @@ public class QueryResult : MonoBehaviour
         }
         else queryResult = result;
 
+        if (queryResult.Count == 0 || queryResult[0].Count == 0)
+            queryResult[0].Add("The query returned nothing.");
         StartCoroutine(Init_CO(query, result, index));
     }
 
